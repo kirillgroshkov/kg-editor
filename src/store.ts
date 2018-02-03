@@ -8,6 +8,7 @@ export interface State {
   title: string
   schema: AppSchema
   activeCollection: string
+  items: { [collectionName: string]: any[] }
 }
 
 export const store = new Vuex.Store<State>({
@@ -15,11 +16,20 @@ export const store = new Vuex.Store<State>({
     title: 'Home',
     schema: { collections: [] },
     activeCollection: '',
+    items: {},
   },
 
   getters: {
     getCollectionByName: (state: State) => (name: string) => {
       return state.schema.collections.find(c => c.name === name)
+    },
+
+    getItems: (state: State) => (collectionName: string) => {
+      return state.items[collectionName] || []
+    },
+
+    getItem: (state: State) => (collectionName: string, itemId: string) => {
+      return (state.items[collectionName] || []).find(item => item.id === itemId)
     },
   },
 
@@ -39,7 +49,16 @@ export const store = new Vuex.Store<State>({
     setActiveCollection (state: State, activeCollection: string): void {
       state.activeCollection = activeCollection
     },
+
+    setItems (state: State, data: {collectionName: string, items: any[]}): void {
+      state.items = {
+        ...state.items,
+        [data.collectionName]: data.items,
+      }
+      /*state.items[data.collectionName] = [
+        ...state.items[data.collectionName] || [],
+        ...data.items,
+      ]*/
+    },
   },
 })
-
-

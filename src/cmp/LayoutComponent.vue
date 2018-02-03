@@ -10,12 +10,12 @@
 
       <md-list>
         <md-list-item
-          v-for="collection in $store.state.schema.collections" :key="collection.name"
-          @click="openCollection(collection)"
-          :to="'/collection/' + collection.name"
+          v-for="c in $store.state.schema.collections" :key="c.name"
+          @click="openCollection(c)"
+          :to="`/collection/${c.name}`"
         >
-          <md-icon>move_to_inbox</md-icon>
-          <span class="md-list-item-text">{{collection.label}}</span>
+          <md-icon>{{ c.icon }}</md-icon>
+          <span class="md-list-item-text">{{ c.label }}</span>
         </md-list-item>
       </md-list>
     </md-app-drawer>
