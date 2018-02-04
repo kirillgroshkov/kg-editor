@@ -1,6 +1,6 @@
 <template>
   <div v-if="item">
-    <md-button class="md-raised md-primary"><md-icon>save</md-icon> Save</md-button>
+    <md-button class="md-raised md-primary" @click="onSave"><md-icon>save</md-icon> Save</md-button>
     <md-button class="md-raised md-transparent" @click="onCancel"><md-icon>cancel</md-icon> Cancel</md-button>
 
     <form novalidate class="md-layout" @submit.prevent="onSubmit">
@@ -48,6 +48,7 @@
 
         <!-- otherwise: String type -->
         <template v-else>
+          <div>
           <md-field md-clearable class="short">
             <label :for="f.name">{{ f.label }} ({{f.type}})</label>
             <md-input :name="f.name" :id="f.name"
@@ -57,10 +58,11 @@
             />
             <span class="md-helper-text" v-if="f.descr">{{ f.descr }}</span>
           </md-field>
+          </div>
         </template>
       </template>
     </form>
-    {{ item }} {{typeof item.date1}}
+    {{ item }}
   </div>
 </template>
 
@@ -101,6 +103,14 @@ export default class EditorPage extends Vue {
   }
 
   onCancel () {
+    router.push(`/collection/${this.collection.name}`)
+  }
+
+  async onSave () {
+    // router.push(`/collection/${this.collection.name}`)
+    console.log('saving', JSON.stringify(this.item, null, 2))
+    await apiService.saveItem(this.collection.name, this.item)
+    // alert('saved!')
     router.push(`/collection/${this.collection.name}`)
   }
 

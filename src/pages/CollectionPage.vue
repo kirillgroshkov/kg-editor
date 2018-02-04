@@ -9,7 +9,7 @@
       <md-table-toolbar v-if="items.length">
         <md-button class="md-raised md-primary" :to="`/edit/${collection.name}/new`"><md-icon>add</md-icon> Create</md-button>
         <md-button class="md-raised md-primary" :to="`/edit/${collection.name}/${selected.id}`" :disabled="!selected.id"><md-icon>edit</md-icon> Edit</md-button> &nbsp; &nbsp;
-        <md-button class="md-raised md-accent" :disabled="!selected.id" @click="deleteClick(selected.id)"><md-icon>delete</md-icon> Delete</md-button> &nbsp; &nbsp;
+        <md-button class="md-raised md-accent" :disabled="!selected.id" @click="onDelete(selected.id)"><md-icon>delete</md-icon> Delete</md-button> &nbsp; &nbsp;
 
         <md-field md-clearable class="md-toolbar-section-end">
           <md-input placeholder="Search..." data-model1="search" data-input1="searchOnTable" />
@@ -72,8 +72,10 @@ export default class CollectionPage extends Vue {
     this.selected = item || {}
   }
 
-  deleteClick (id: string) {
-    alert('delete ' + id)
+  async onDelete (id: string) {
+    await apiService.deleteItem(this.collection.name, id)
+    // alert('deleted ' + id)
+    await apiService.getItems(this.collection.name)
   }
 
   async mounted () {
