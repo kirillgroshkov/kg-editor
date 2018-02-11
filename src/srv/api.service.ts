@@ -1,3 +1,5 @@
+import { env } from '@/environment/environment'
+import { fetchService } from '@/srv/fetch.service'
 import { stringUtil } from '@/srv/string.util'
 import { store } from '@/store'
 
@@ -23,13 +25,9 @@ export interface Field {
   maxLength?: number
 }
 
-const HOST = 'http://localhost:3000'
-
 class ApiService {
   async getSchema (): Promise<AppSchema> {
-    const r = await fetch(`${HOST}/schema`)
-    // await new Promise(r => setTimeout(r, 5000))
-    const s = (await r.json()) as AppSchema
+    const s = await fetchService.get<AppSchema>(`${env().apiUrl}/schema`)
 
     s.collections.forEach(c => {
       Object.assign(c, {
@@ -57,8 +55,7 @@ class ApiService {
   }
 
   async getItems<T> (collectionName: string): Promise<T[]> {
-    const r = await fetch(`${HOST}/data/${collectionName}`)
-    const items: T[] = await r.json()
+    const items = await fetchService.get<T[]>(`${env().apiUrl}/data/${collectionName}`)
 
     /*const items = [
       { id: '1' + collectionName, lang: 'en', metaTitle: 'metaTitl', metaDescription: 'metaDescr', pub: true, content: 'la-la-la!' },
@@ -76,23 +73,15 @@ class ApiService {
   }
 
   async saveItem (collectionName: string, item: any): Promise<void> {
-    const r = await fetch(`${HOST}/data/${collectionName}`, {
-      method: 'put',
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      }),
-      body: JSON.stringify(item),
+    const r = await fetchService.put(`${env().apiUrl}/data/${collectionName}`, {
+      body: item,
     })
-    const resp = await r.json()
-    console.log('resp!', resp)
+    console.log('resp!', r)
   }
 
   async deleteItem (collectionName: string, itemId: string): Promise<void> {
-    const r = await fetch(`${HOST}/data/${collectionName}/${itemId}`, {
-      method: 'delete',
-    })
-    const resp = await r.json()
-    console.log('resp!', resp)
+    const r = await fetchService.delete(`${env().apiUrl}/data/${collectionName}/${itemId}`)
+    console.log('resp!', r)
   }
 }
 
