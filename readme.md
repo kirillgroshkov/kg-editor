@@ -1,4 +1,4 @@
-# kg-editor2
+# kg-editor
 
 > kg-editor
 
