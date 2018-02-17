@@ -1,5 +1,6 @@
 <template>
-  <div v-if="item">
+  <pre v-if="loading">{{loading}}</pre>
+  <div v-else>
     <md-button class="md-raised md-primary" @click="onSave"><md-icon>save</md-icon> Save</md-button>
     <md-button class="md-raised md-transparent" @click="onCancel"><md-icon>cancel</md-icon> Cancel</md-button>
 
@@ -74,6 +75,8 @@ import { apiService, Collection } from "../srv/api.service"
 
 @Component
 export default class EditorPage extends Vue {
+  loading = 'loading...'
+
   get collection (): Collection {
     return this.$store.getters.getCollectionByName(this.$route.params['collectionName'])
   }
@@ -89,6 +92,8 @@ export default class EditorPage extends Vue {
   item: any = null
 
   async mounted () {
+    this.loading = 'loading...'
+
     // console.log('mounted! ' + this.itemId)
     if (this.newItem) {
       this.item = {} // tada: put default values for each field
@@ -100,6 +105,8 @@ export default class EditorPage extends Vue {
         if (!this.item) alert('item not found!')
       }
     }
+
+    this.loading = ''
   }
 
   onCancel () {
@@ -107,6 +114,8 @@ export default class EditorPage extends Vue {
   }
 
   async onSave () {
+    this.loading = 'saving...'
+
     // router.push(`/collection/${this.collection.name}`)
     console.log('saving', JSON.stringify(this.item, null, 2))
     await apiService.saveItem(this.collection.name, this.item)

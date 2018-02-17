@@ -7200,9 +7200,9 @@ ts-jest@^22.0.0:
     source-map-support "^0.5.0"
     yargs "^11.0.0"
 
-ts-loader@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-3.4.0.tgz#c376bc0538d4c441ea8790c3fd841ebfdbfb99d0"
+ts-loader@^3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-3.5.0.tgz#151d004dcddb4cf8e381a3bf9d6b74c2d957a9c0"
   dependencies:
     chalk "^2.3.0"
     enhanced-resolve "^3.0.0"
@@ -7308,9 +7308,9 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@^2.2.1:
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.1.tgz#bb3682c2c791ac90e7c6210b26478a8da085c359"
+typescript@^2.7.2:
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.2.tgz#2d615a1ef4aee4f574425cdff7026edf81919836"
 
 uglify-es@^3.3.4:
   version "3.3.9"
@@ -7562,8 +7562,8 @@ vm-browserify@0.0.4:
     indexof "0.0.1"
 
 vue-class-component@^6.0.0:
-  version "6.1.2"
-  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-6.1.2.tgz#87ac0265b0db71a3f49f10d90e4f69f9be9c2fbd"
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-6.2.0.tgz#7adb1daa9a868c75f30f97f33f4f1b94aee62089"
 
 vue-hot-reload-api@^2.2.0:
   version "2.2.4"
@@ -7587,7 +7587,7 @@ vue-loader@^14.1.1:
     vue-style-loader "^4.0.1"
     vue-template-es2015-compiler "^1.6.0"
 
-vue-material@^1.0.0-beta-7:
+vue-material@^1.0.0-beta-8:
   version "1.0.0-beta-8"
   resolved "https://registry.yarnpkg.com/vue-material/-/vue-material-1.0.0-beta-8.tgz#88b44095a59d46df5beed722dd5e2fb962f74138"
 
@@ -7608,16 +7608,16 @@ vue-router@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.0.1.tgz#d9b05ad9c7420ba0f626d6500d693e60092cc1e9"
 
-vue-style-loader@^3.0.1:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-3.1.2.tgz#6b66ad34998fc9520c2f1e4d5fa4091641c1597a"
+vue-style-loader@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-4.0.1.tgz#252300d32eb97e83c1a1cb5b2029e2d8c3adcf9f"
   dependencies:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
 
-vue-style-loader@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-4.0.1.tgz#252300d32eb97e83c1a1cb5b2029e2d8c3adcf9f"
+vue-style-loader@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-4.0.2.tgz#e89aa4702a0c6b9630d8de70b1cbddb06b9ad254"
   dependencies:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"

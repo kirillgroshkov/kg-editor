@@ -6,6 +6,7 @@ Vue.use(Vuex)
 
 export interface State {
   title: string
+  project: string
   schema: AppSchema
   activeCollection: string
   items: { [collectionName: string]: any[] }
@@ -14,6 +15,7 @@ export interface State {
 export const store = new Vuex.Store<State>({
   state: {
     title: 'Home',
+    project: 'innocent',
     schema: { collections: [] },
     activeCollection: '',
     items: {},
@@ -25,7 +27,7 @@ export const store = new Vuex.Store<State>({
     },
 
     getItems: (state: State) => (collectionName: string) => {
-      return state.items[collectionName] || []
+      return state.items[collectionName]
     },
 
     getItem: (state: State) => (collectionName: string, itemId: string) => {

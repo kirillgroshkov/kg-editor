@@ -1,5 +1,5 @@
 import { env } from '@/environment/environment'
-import { fetchService } from '@/srv/fetch.service'
+import { FetchService, fetchService } from '@/srv/fetch.service'
 import { stringUtil } from '@/srv/string.util'
 import { store } from '@/store'
 
@@ -25,10 +25,20 @@ export interface Field {
   maxLength?: number
 }
 
-class ApiService {
-  async getSchema (): Promise<AppSchema> {
-    const s = await fetchService.get<AppSchema>(`${env().apiUrl}/schema`)
+class ApiService extends FetchService {
+  async fetch<T> (method: string, _url: string, _opt: RequestInit = {}): Promise<T> {
+    const url = `${env().apiUrl}/${store.state.project}${_url}`
+    return super.fetch<T>(method, url, _opt)
+  }
 
+  async getSchema (): Promise<AppSchema> {
+    const s = await this.get<AppSchema>(`/schema`)
+    this.completeSchema(s)
+    return s
+  }
+
+  // mutates
+  private completeSchema (s: AppSchema): void {
     s.collections.forEach(c => {
       Object.assign(c, {
         label: c.label || stringUtil.capitalizeFirstLetter(c.name),
@@ -50,12 +60,10 @@ class ApiService {
         })
       })
     })
-
-    return s
   }
 
   async getItems<T> (collectionName: string): Promise<T[]> {
-    const items = await fetchService.get<T[]>(`${env().apiUrl}/data/${collectionName}`)
+    const items = await this.get<T[]>(`/data/${collectionName}`)
 
     /*const items = [
       { id: '1' + collectionName, lang: 'en', metaTitle: 'metaTitl', metaDescription: 'metaDescr', pub: true, content: 'la-la-la!' },
@@ -73,14 +81,14 @@ class ApiService {
   }
 
   async saveItem (collectionName: string, item: any): Promise<void> {
-    const r = await fetchService.put(`${env().apiUrl}/data/${collectionName}`, {
+    const r = await this.put(`/data/${collectionName}`, {
       body: item,
     })
     console.log('resp!', r)
   }
 
   async deleteItem (collectionName: string, itemId: string): Promise<void> {
-    const r = await fetchService.delete(`${env().apiUrl}/data/${collectionName}/${itemId}`)
+    const r = await this.delete(`/data/${collectionName}/${itemId}`)
     console.log('resp!', r)
   }
 }
