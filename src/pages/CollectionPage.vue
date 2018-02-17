@@ -1,6 +1,6 @@
 <template>
   <div>
-    <pre v-if="loading">loading...</pre>
+    <pre v-if="loading || loadingTxt">loading...</pre>
     <template v-else>
       <div v-if="!items.length">
         <md-empty-state
@@ -55,6 +55,8 @@ import { apiService, Collection } from "../srv/api.service"
 
 @Component
 export default class CollectionPage extends Vue {
+  loadingTxt = ''
+
   get loading () {
     return !this.$store.getters.getItems(this.collection.name)
   }
@@ -82,9 +84,11 @@ export default class CollectionPage extends Vue {
   }
 
   async onDelete (id: string) {
+    this.loadingTxt = 'deleting...'
     await apiService.deleteItem(this.collection.name, id)
     // alert('deleted ' + id)
     await apiService.getItems(this.collection.name)
+    this.loadingTxt = ''
   }
 
   async mounted () {
