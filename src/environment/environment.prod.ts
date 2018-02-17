@@ -4,7 +4,6 @@ export class EnvironmentProd {
   dev = false
 
   apiUrl = 'https://kg-backend.now.sh/editor'
-
 }
 
 export type Environment = EnvironmentProd

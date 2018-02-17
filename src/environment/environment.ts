@@ -10,7 +10,12 @@ const ENVIRONMENTS = {
 
 let environment: Environment
 
-environment = ENVIRONMENTS['dev']
+if (process.env.NG_ENV) {
+  environment = ENVIRONMENTS['prod']
+} else {
+  environment = ENVIRONMENTS['dev']
+}
+
 // todo: support prod from netlify
 
 export function env (): Environment {
