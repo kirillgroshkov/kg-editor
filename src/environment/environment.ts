@@ -10,7 +10,7 @@ const ENVIRONMENTS = {
 
 let environment: Environment
 
-if (process.env.NG_ENV) {
+if (location.href.includes('netlify')) {
   environment = ENVIRONMENTS['prod']
 } else {
   environment = ENVIRONMENTS['dev']
