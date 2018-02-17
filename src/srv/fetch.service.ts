@@ -3,6 +3,7 @@ export class FetchService {
     // avoid mutation
     const opt = {
       method,
+      credentials: 'include',
       ..._opt
     } as any
 
