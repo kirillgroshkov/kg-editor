@@ -20,8 +20,6 @@
       >
         <md-table-toolbar v-if="items.length">
           <md-button class="md-raised md-primary" :to="`/edit/${collection.name}/new`"><md-icon>add</md-icon> Create</md-button>
-          <md-button class="md-raised md-primary" :to="`/edit/${collection.name}/${selected.id}`" :disabled="!selected.id"><md-icon>edit</md-icon> Edit</md-button> &nbsp; &nbsp;
-          <md-button class="md-raised md-accent" :disabled="!selected.id" @click="onDelete(selected.id)"><md-icon>delete</md-icon> Delete</md-button> &nbsp; &nbsp;
 
           <md-field md-clearable class="md-toolbar-section-end">
             <md-input placeholder="Search..." data-model1="search" data-input1="searchOnTable" />
@@ -40,6 +38,12 @@
             md-numeric
           >
             {{ item[f.name] }}
+          </md-table-cell>
+
+          <md-table-cell>
+            <md-button class="md-icon-button" @click="onDelete(item.id)">
+              <md-icon>delete</md-icon>
+            </md-button>
           </md-table-cell>
         </md-table-row>
       </md-table>
@@ -76,14 +80,17 @@ export default class CollectionPage extends Vue {
   currentSort = 'id'
   currentSortOrder = 'desc'
 
-  selected = {}
-
   onSelect (item: any) {
+    if (!item) return
     // alert('onSelect' + item)
-    this.selected = item || {}
+    // this.selected = item || {}
+    const selectedId = item.id
+    this.$router.push(`/edit/${this.collection.name}/${selectedId}`)
+
   }
 
   async onDelete (id: string) {
+    if (!confirm('sure?')) return
     this.loadingTxt = 'deleting...'
     await apiService.deleteItem(this.collection.name, id)
     // alert('deleted ' + id)
@@ -97,7 +104,6 @@ export default class CollectionPage extends Vue {
 
   async init (collectionName: string) {
     console.log('init: ' + collectionName)
-    this.selected = {}
     await apiService.getItems(collectionName)
   }
 
