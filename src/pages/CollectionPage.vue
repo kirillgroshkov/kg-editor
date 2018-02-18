@@ -32,7 +32,7 @@
           md-selectable="single"
         >
           <md-table-cell
-            v-for="f in collection.fields" :key="f.name"
+            v-for="f in fields" :key="f.name"
             :md-label="f.label"
             :md-sort-by="f.name"
             md-numeric
@@ -56,7 +56,7 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Route } from "vue-router";
 import { apiService } from "../srv/api.service"
-import { Collection } from '../srv/schema.service';
+import { Collection, Field } from "../srv/schema.service"
 
 @Component
 export default class CollectionPage extends Vue {
@@ -68,6 +68,11 @@ export default class CollectionPage extends Vue {
 
   get collection (): Collection {
     return this.$store.getters.getCollectionByName(this.$route.params['collectionName'])
+  }
+
+  get fields (): Field {
+    const type = this.collection.type
+    return this.$store.getters.getTypeByName(type).fields
   }
 
   get items () {

@@ -1,7 +1,6 @@
 import { env } from '@/environment/environment'
 import { FetchService, fetchService } from '@/srv/fetch.service'
-import { AppSchema } from '@/srv/schema.service'
-import { stringUtil } from '@/srv/string.util'
+import { AppSchema, Collection, Field, SchemaType } from '@/srv/schema.service'
 import { store } from '@/store'
 
 class ApiService extends FetchService {
@@ -11,34 +10,7 @@ class ApiService extends FetchService {
   }
 
   async getSchema (): Promise<AppSchema> {
-    const s = await this.get<AppSchema>(`/schema`)
-    this.completeSchema(s)
-    return s
-  }
-
-  // mutates
-  private completeSchema (s: AppSchema): void {
-    s.collections.forEach(c => {
-      Object.assign(c, {
-        label: c.label || stringUtil.capitalizeFirstLetter(c.name),
-        icon: c.icon || 'collections',
-      })
-
-      c.fields.forEach(f => {
-        if (f.name === 'id') {
-          Object.assign(f, {
-            type: 'id',
-            label: 'id',
-            maxLength: f.maxLength || 16,
-          })
-        }
-
-        Object.assign(f, {
-          type: f.type || 'string',
-          label: f.label || stringUtil.capitalizeFirstLetter(f.name),
-        })
-      })
-    })
+    return this.get<AppSchema>(`/schema`)
   }
 
   async getItems<T> (collectionName: string): Promise<T[]> {

@@ -16,7 +16,7 @@ export const store = new Vuex.Store<State>({
   state: {
     title: 'Home',
     project: 'innocent',
-    schema: { collections: [] },
+    schema: { collections: [], types: [] },
     activeCollection: '',
     items: {},
   },
@@ -24,6 +24,10 @@ export const store = new Vuex.Store<State>({
   getters: {
     getCollectionByName: (state: State) => (name: string) => {
       return state.schema.collections.find(c => c.name === name)
+    },
+
+    getTypeByName: (state: State) => (name: string) => {
+      return state.schema.types.find(c => c.name === name)
     },
 
     getItems: (state: State) => (collectionName: string) => {

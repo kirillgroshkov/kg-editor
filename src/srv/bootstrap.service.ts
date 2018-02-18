@@ -1,6 +1,7 @@
 import { memo } from '@/decorators/memo.decorator'
 import { env, logEnvironment } from '@/environment/environment'
 import { apiService } from '@/srv/api.service'
+import { schemaService } from '@/srv/schema.service'
 import { store } from '@/store'
 
 class BootstrapService {
@@ -9,6 +10,7 @@ class BootstrapService {
     logEnvironment()
     try {
       const schema = await apiService.getSchema()
+      schemaService.completeSchema(schema)
       store.commit('setSchema', schema)
     } catch (err) {
       if (err && err.response && err.response.status === 401) {

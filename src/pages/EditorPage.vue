@@ -5,9 +5,10 @@
     <md-button class="md-raised md-transparent" @click="onCancel"><md-icon>cancel</md-icon> Cancel</md-button>
 
     <form novalidate class="md-layout" @submit.prevent="onSubmit">
-      <template v-for="f in collection.fields">
-        <component v-bind:is="getFieldComponent(f)" :field="f" :item="item"></component>
-      </template>
+      <component
+        v-for="f in fields" :key="f.name"
+        v-bind:is="getFieldComponent(f.type)"
+        :field="f" :item="item"/>
     </form>
     {{ item }}
   </div>
@@ -28,6 +29,11 @@ export default class EditorPage extends Vue {
     return this.$store.getters.getCollectionByName(this.$route.params['collectionName'])
   }
 
+  get fields (): Field {
+    const type = this.collection.type
+    return this.$store.getters.getTypeByName(type).fields
+  }
+
   get itemId (): string {
     return this.$route.params['itemId']
   }
@@ -38,8 +44,8 @@ export default class EditorPage extends Vue {
 
   item: any = null
 
-  getFieldComponent (f: Field) {
-    return schemaService.getFieldComponent(f)
+  getFieldComponent (type: string) {
+    return schemaService.getFieldComponent(type)
   }
 
   async mounted () {
