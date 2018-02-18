@@ -55,7 +55,8 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Route } from "vue-router";
-import { apiService, Collection } from "../srv/api.service"
+import { apiService } from "../srv/api.service"
+import { Collection } from '../srv/schema.service';
 
 @Component
 export default class CollectionPage extends Vue {

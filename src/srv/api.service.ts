@@ -1,29 +1,8 @@
 import { env } from '@/environment/environment'
 import { FetchService, fetchService } from '@/srv/fetch.service'
+import { AppSchema } from '@/srv/schema.service'
 import { stringUtil } from '@/srv/string.util'
 import { store } from '@/store'
-
-export interface AppSchema {
-  collections: Collection[]
-}
-
-export interface Collection {
-  name: string
-  label: string
-  icon: string
-  folders: boolean
-  fields: Field[]
-}
-
-export interface Field {
-  name: string
-  label: string
-  type: string
-  required: boolean
-
-  minLength?: number
-  maxLength?: number
-}
 
 class ApiService extends FetchService {
   async fetch<T> (method: string, _url: string, _opt: RequestInit = {}): Promise<T> {

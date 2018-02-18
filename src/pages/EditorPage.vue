@@ -6,61 +6,7 @@
 
     <form novalidate class="md-layout" @submit.prevent="onSubmit">
       <template v-for="f in collection.fields">
-        <!-- Boolean -->
-        <template v-if="f.type === 'boolean'">
-          <md-checkbox v-model="item[f.name]" class="md-primary short">
-            {{ f.label }} &nbsp; <small v-if="f.descr">({{ f.descr }})</small>
-          </md-checkbox>
-        </template>
-
-        <!-- Date -->
-        <template v-else-if="f.type === 'date'">
-          <md-datepicker v-model="item[f.name]" md-clearable class="short">
-            <label>{{ f.label }}</label>
-          </md-datepicker>
-        </template>
-
-        <!-- Text -->
-        <template v-else-if="f.type === 'markdown'">
-          <md-field md-clearable>
-            <label :for="f.name">{{ f.label }} ({{f.type}})</label>
-            <md-textarea :name="f.name" :id="f.name"
-                         v-model="item[f.name]"
-                         :maxlength="f.maxLength"
-                         :required="f.required"
-                         md-autogrow1
-            />
-            <span class="md-helper-text" v-if="f.descr">{{ f.descr }}</span>
-          </md-field>
-        </template>
-
-        <!-- Number -->
-        <template v-else-if="f.type === 'number'">
-          <md-field md-clearable class="short">
-            <label :for="f.name">{{ f.label }} ({{f.type}})</label>
-            <md-input :name="f.name" :id="f.name"
-                      v-model="item[f.name]"
-                      type="number"
-                      :required="f.required"
-            />
-            <span class="md-helper-text" v-if="f.descr">{{ f.descr }}</span>
-          </md-field>
-        </template>
-
-        <!-- otherwise: String type -->
-        <template v-else>
-          <div>
-          <md-field md-clearable class="short">
-            <label :for="f.name">{{ f.label }} ({{f.type}})</label>
-            <md-input :name="f.name" :id="f.name"
-                      v-model="item[f.name]"
-                      :required="f.required"
-                      :maxlength="f.maxLength"
-            />
-            <span class="md-helper-text" v-if="f.descr">{{ f.descr }}</span>
-          </md-field>
-          </div>
-        </template>
+        <component v-bind:is="getFieldComponent(f)" :field="f" :item="item"></component>
       </template>
     </form>
     {{ item }}
@@ -71,7 +17,8 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { router } from '../router';
-import { apiService, Collection } from "../srv/api.service"
+import { apiService } from "../srv/api.service"
+import { Collection, Field, schemaService } from "../srv/schema.service"
 
 @Component
 export default class EditorPage extends Vue {
@@ -90,6 +37,10 @@ export default class EditorPage extends Vue {
   }
 
   item: any = null
+
+  getFieldComponent (f: Field) {
+    return schemaService.getFieldComponent(f)
+  }
 
   async mounted () {
     this.loading = 'loading...'

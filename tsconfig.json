@@ -6,6 +6,7 @@
     },
     "sourceMap": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "target": "es2015",
     "module": "es2015",

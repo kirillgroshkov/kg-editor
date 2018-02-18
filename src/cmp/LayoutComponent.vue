@@ -30,7 +30,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { Collection } from "../srv/api.service";
+import { Collection } from '../srv/schema.service';
 
 @Component
 export default class LayoutComponent extends Vue {

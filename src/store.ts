@@ -1,4 +1,4 @@
-import { AppSchema } from '@/srv/api.service'
+import { AppSchema } from '@/srv/schema.service'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
