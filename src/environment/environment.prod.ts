@@ -3,6 +3,7 @@ export class EnvironmentProd {
   prod = true
   dev = false
 
+  loginUrl = 'https://kg-backend.now.sh/login'
   apiUrl = 'https://kg-backend.now.sh/editor'
 }
 
