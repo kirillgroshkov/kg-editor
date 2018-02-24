@@ -23,9 +23,7 @@
         @input="updateSubItem($event, f.name)"
         />
 
-      <pre>subItem: {{subItem}}
-      value: {{value}}
-      </pre>
+      <pre>{{subItem}}</pre>
     </md-card-content>
   </md-card>
 </template>
@@ -40,7 +38,7 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
   expanded = true
 
   get subType (): Field {
-    console.log('subType: ' + this.field!.type)
+    // console.log('subType: ' + this.field!.type)
     return this.$store.getters.getTypeByName(this.field!.type)
   }
 
@@ -49,10 +47,10 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
     return this.value
   }
 
-  /*set subItem (v: any) {
+  set subItem (v: any) {
     // this.$emit('input', JSON.stringify(v || {}))
     this.$emit('input', v)
-  }*/
+  }
 
   getFieldComponent (type: string) {
     return schemaService.getFieldComponent(type)
@@ -63,22 +61,12 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
   }
 
   updateSubItem (v: any, fieldName: string) {
-    console.log('updateSubItem obj ' + fieldName, v)
+    // console.log('updateSubItem obj ' + fieldName, v)
 
-    /*
     this.subItem = {
       ...this.subItem,
       [fieldName]: v,
-    }*/
-    // this.subItem[fieldName] = v
-
-    const subItem = {
-      ...this.subItem,
-      [fieldName]: v,
     }
-    // this.subItem = subItem
-    // this.$emit('input', JSON.parse(JSON.stringify(subItem)))
-    this.$emit('input', subItem)
   }
 }
 </script>

@@ -27,6 +27,7 @@ import Component from 'vue-class-component'
 import { router } from '../router';
 import { apiService } from "../srv/api.service"
 import { Collection, Field, schemaService } from "../srv/schema.service"
+import { objectUtil } from '../util/object.util';
 
 @Component
 export default class EditorPage extends Vue {
@@ -88,12 +89,12 @@ export default class EditorPage extends Vue {
   }
 
   updateSubItem (v: any, fieldName: string) {
-    console.log(`updateSubItem editor ${fieldName}`, v)
+    // console.log(`updateSubItem editor ${fieldName}`, v)
 
     // Vue.set(this.item, fieldName, v)
     this.item = {
       ...this.item,
-      [fieldName]: v,
+      [fieldName]: objectUtil.deepCopy(v),
     }
   }
 }

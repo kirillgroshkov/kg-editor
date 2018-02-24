@@ -13,7 +13,7 @@ export class BaseFieldComponent extends Vue {
   value: any
 
   updateValue (v: any) {
-    console.log('updateValue', v)
+    // console.log('updateValue', v)
     this.$emit('input', v)
   }
 }

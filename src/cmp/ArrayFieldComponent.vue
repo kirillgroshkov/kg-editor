@@ -65,7 +65,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   expandedSubItem: number = null
 
   get subItems (): any[] {
-    console.log('subItemssss', this.value)
+    // console.log('subItemssss', this.value)
     return this.value || []
     /*
     // const a = this.item[this.field!.name]
@@ -129,7 +129,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
 
   getSubField () {
     const subType = this.$store.getters.getTypeByName(this.field.arrayOf)
-    console.log('subType: ', subType)
+    // console.log('subType: ', subType)
     if (subType) {
       // for object types
       subType.type = subType.name
@@ -141,7 +141,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   }
 
   updateSubItem (v: any, i: any) {
-    console.log('updateSubItem arr [' + i + ']', v)
+    // console.log('updateSubItem arr [' + i + ']', v)
 
     const subItems = this.subItems
     subItems[i] = v
