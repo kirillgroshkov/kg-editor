@@ -5,7 +5,6 @@
       <md-card-header-text>
         <div class="md-title" @click.native="toggleExpand">{{field.label}} ({{subItems.length}})</div>
         <div class="md-subhead" v-if="field.descr">{{field.descr}}</div>
-        {{subItems}}
       </md-card-header-text>
 
       <md-menu md-size="big" md-direction="bottom-end" @click="toggleExpand">
@@ -33,7 +32,7 @@
           <div class="md-layout-item md-size-100 md-layout md-alignment-center-left" v-if="expandedSubItem === i">
             <component
               v-bind:is="getFieldComponent(field.arrayOf)"
-              :field="field"
+              :field="getSubField()"
               :value="subItem"
               @input="updateSubItem($event, i)"
             />
@@ -44,6 +43,8 @@
           <md-button @click="onDone">Done</md-button>
         </md-card-actions>
       </md-card>
+
+      <pre>{{subItems}}</pre>
     </md-card-content>
 
     <md-card-actions md-alignment="left" v-show="expanded">
@@ -105,7 +106,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
 
   addEmptySubItem () {
     const subItems = this.subItems
-    subItems.push('')
+    subItems.push('{}') // todo: !!!
     this.subItems = subItems
     this.expandedSubItem = subItems.length - 1
     console.log('exp: ' + this.expandedSubItem)
@@ -119,6 +120,19 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
 
   getFieldComponent (type: string) {
     return schemaService.getFieldComponent(type)
+  }
+
+  getSubField () {
+    const subType = this.$store.getters.getTypeByName(this.field.arrayOf)
+    console.log('subType: ', subType)
+    if (subType) {
+      // for object types
+      subType.type = subType.name
+      return subType
+    }
+
+    // for primitive types
+    return this.field
   }
 
   updateSubItem (v: any, i: any) {
