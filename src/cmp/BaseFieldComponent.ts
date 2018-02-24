@@ -6,6 +6,14 @@ export class BaseFieldComponent extends Vue {
   @Prop()
   field: Field | undefined
 
+  // @Prop()
+  // item: any
+
   @Prop()
-  item: any
+  value: any
+
+  updateValue (v: any) {
+    console.log('updateValue', v)
+    this.$emit('input', v)
+  }
 }

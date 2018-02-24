@@ -2,7 +2,8 @@
   <md-field md-clearable class="short">
     <label :for="field.name">{{ field.label }} ({{field.type}})</label>
     <md-input :name="field.name" :id="field.name"
-              v-model="item[field.name]"
+              :value="value"
+              @input="updateValue($event)"
               type="number"
               :required="field.required"
     />

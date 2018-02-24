@@ -2,7 +2,8 @@
   <md-field md-clearable class="short">
     <label :for="field.name">{{ field.label }} ({{field.type}})</label>
     <md-input :name="field.name" :id="field.name"
-              v-model="item[field.name]"
+              :value="value"
+              @input="updateValue($event)"
               :required="field.required"
               :maxlength="field.maxLength"
     />
@@ -15,7 +16,9 @@ import Component from 'vue-class-component'
 import { BaseFieldComponent } from './BaseFieldComponent';
 
 @Component
-export default class StringFieldComponent extends BaseFieldComponent {}
+export default class StringFieldComponent extends BaseFieldComponent {
+
+}
 </script>
 
 <style lang="scss" scoped></style>

@@ -1,16 +1,22 @@
 <template>
   <pre v-if="loading">{{loading}}</pre>
   <div v-else>
-    <md-button class="md-raised md-primary" @click="onSave"><md-icon>save</md-icon> Save</md-button>
+    <md-button class="md-raised md-primary"
+               style="margin-left: 0;"
+               @click="onSave"><md-icon>save</md-icon> Save</md-button>
     <md-button class="md-raised md-transparent" @click="onCancel"><md-icon>cancel</md-icon> Cancel</md-button>
 
-    <form novalidate class="md-layout" @submit.prevent="onSubmit">
+    <form novalidate class="md-layout">
       <component
         v-for="f in fields" :key="f.name"
         v-bind:is="getFieldComponent(f.type)"
-        :field="f" :item="item"/>
+        v-model="item[f.name]"
+        aitem="item"
+        :field="f"
+      />
     </form>
-    {{ item }}
+    <pre>{{ item }}</pre>
+
   </div>
 </template>
 
@@ -78,10 +84,6 @@ export default class EditorPage extends Vue {
     await apiService.saveItem(this.collection.name, this.item)
     // alert('saved!')
     router.push(`/collection/${this.collection.name}`)
-  }
-
-  onSubmit () {
-    alert('onSubmit')
   }
 }
 </script>

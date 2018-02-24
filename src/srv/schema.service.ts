@@ -51,6 +51,16 @@ const TYPE_MAP: {[type: string]: any} = {
   array: ArrayFieldComponent,
 }
 
+const EMPTY_ITEM_MAP: {[type: string]: () => any} = {
+  boolean: () => false,
+  string: () => '',
+  // date: DateFieldComponent,
+  // text: TextFieldComponent,
+  // number: NumberFieldComponent,
+  // object: ObjectFieldComponent,
+  // array: ArrayFieldComponent,
+}
+
 const DEF_FIELD_COMP = StringFieldComponent
 
 

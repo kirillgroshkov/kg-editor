@@ -1,5 +1,9 @@
 <template>
-  <md-checkbox v-model="item[field.name]" class="md-primary short">
+  <md-checkbox
+    class="md-primary short"
+    :model="value"
+    @change="updateValue(!!$event)"
+  >
     {{ field.label }} &nbsp; <small v-if="field.descr">({{ field.descr }})</small>
   </md-checkbox>
 </template>

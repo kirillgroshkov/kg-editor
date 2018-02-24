@@ -1,5 +1,10 @@
 <template>
-  <md-datepicker v-model="item[field.name]" md-clearable class="short">
+  <md-datepicker
+    :value="value"
+    @input="updateValue($event)"
+    md-clearable
+    class="short"
+  >
     <label>{{ field.label }}</label>
   </md-datepicker>
 </template>

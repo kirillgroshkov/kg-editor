@@ -2,7 +2,8 @@
   <md-field md-clearable>
     <label :for="field.name">{{ field.label }} ({{field.type}})</label>
     <md-textarea :name="field.name" :id="field.name"
-                 v-model="item[field.name]"
+                 :value="value"
+                 @input="updateValue($event)"
                  :maxlength="field.maxLength"
                  :required="field.required"
                  md-autogrow1
