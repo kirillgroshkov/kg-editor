@@ -65,12 +65,15 @@ const DEF_FIELD_COMP = StringFieldComponent
 
 
 class SchemaService {
+  isObjectType (type: string): boolean {
+    return !!store.getters.getTypeByName(type)
+  }
+
   getFieldComponent (type: string): Component {
     let c = TYPE_MAP[type]
     if (c) return c
 
-    c = store.getters.getTypeByName(type)
-    if (c) return ObjectFieldComponent
+    if (this.isObjectType(type)) return ObjectFieldComponent
 
     return DEF_FIELD_COMP
   }

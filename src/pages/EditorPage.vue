@@ -10,8 +10,9 @@
       <component
         v-for="f in fields" :key="f.name"
         v-bind:is="getFieldComponent(f.type)"
-        v-model="item[f.name]"
-        aitem="item"
+        av-model="item[f.name]"
+        :value="item[f.name]"
+        @input="updateSubItem($event, f.name)"
         :field="f"
       />
     </form>
@@ -84,6 +85,16 @@ export default class EditorPage extends Vue {
     await apiService.saveItem(this.collection.name, this.item)
     // alert('saved!')
     router.push(`/collection/${this.collection.name}`)
+  }
+
+  updateSubItem (v: any, fieldName: string) {
+    console.log(`updateSubItem editor ${fieldName}`, v)
+
+    // Vue.set(this.item, fieldName, v)
+    this.item = {
+      ...this.item,
+      [fieldName]: v,
+    }
   }
 }
 </script>

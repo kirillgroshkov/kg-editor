@@ -33,7 +33,7 @@
             <component
               v-bind:is="getFieldComponent(field.arrayOf)"
               :field="getSubField()"
-              :value="subItem"
+              :value="subItems[i]"
               @input="updateSubItem($event, i)"
             />
           </div>
@@ -65,15 +65,19 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   expandedSubItem: number = null
 
   get subItems (): any[] {
+    console.log('subItemssss', this.value)
+    return this.value || []
+    /*
     // const a = this.item[this.field!.name]
     const a = this.value
     if (!a) return []
     const subItems = JSON.parse(a)
-    return subItems
+    return subItems*/
   }
 
   set subItems (v: any) {
-    this.$emit('input', JSON.stringify(v || []))
+    // this.$emit('input', JSON.stringify(v || []))
+    this.$emit('input', v || [])
   }
 
   get fieldComponent () {
@@ -105,11 +109,12 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   }
 
   addEmptySubItem () {
+    const emptyItem = schemaService.isObjectType(this.field.arrayOf) ? {} : undefined
     const subItems = this.subItems
-    subItems.push('{}') // todo: !!!
+    subItems.push(emptyItem)
     this.subItems = subItems
     this.expandedSubItem = subItems.length - 1
-    console.log('exp: ' + this.expandedSubItem)
+    // console.log('exp: ' + this.expandedSubItem)
   }
 
   removeSubItem (i) {
@@ -136,7 +141,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   }
 
   updateSubItem (v: any, i: any) {
-    console.log('updateSubItem', v, i)
+    console.log('updateSubItem arr [' + i + ']', v)
 
     const subItems = this.subItems
     subItems[i] = v
