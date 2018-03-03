@@ -9,7 +9,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "lru-cache": "^4.1.1",
+    "kg-shared": "^1.0.2",
     "vue": "^2.5.2",
     "vue-class-component": "^6.0.0",
     "vue-material": "^1.0.0-beta-8",
@@ -18,8 +18,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@types/lru-cache": "^4.1.0",
-    "@types/node": "^9.4.0",
+    "@naturalcycles/shared-dev": "^1.0.10",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.22.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
@@ -40,7 +39,6 @@
     "fork-ts-checker-webpack-plugin": "^0.3.0",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "html-webpack-plugin": "^2.30.1",
-    "kg-dev": "^1.0.0",
     "node-notifier": "^5.1.2",
     "node-sass": "^4.7.2",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
