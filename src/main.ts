@@ -12,7 +12,22 @@ import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default-dark.css'
 Vue.use(VueMaterial)
 
-new Vue({
+// Progress bar
+const VueProgressBar = require('vue-progressbar')
+Vue.use(VueProgressBar, {
+  // color: '#bffaf3',
+  // failedColor: '#874b4b',
+  thickness: '4px',
+  transition: {
+    speed: '0.2s',
+    opacity: '0.6',
+    termination: 300,
+  },
+})
+
+import '@/dir/focus.dir'
+
+export const app = new Vue({
   router,
   store,
   el: '#app',

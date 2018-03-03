@@ -7,6 +7,7 @@ Vue.use(Vuex)
 export interface State {
   title: string
   project: string
+  snackbarText: string
   schema: AppSchema
   activeCollection: string
   items: { [collectionName: string]: any[] }
@@ -16,6 +17,7 @@ export const store = new Vuex.Store<State>({
   state: {
     title: 'Home',
     project: 'innocent',
+    snackbarText: '',
     schema: { collections: [], types: [] },
     activeCollection: '',
     items: {},
@@ -37,6 +39,10 @@ export const store = new Vuex.Store<State>({
     getItem: (state: State) => (collectionName: string, itemId: string) => {
       return (state.items[collectionName] || []).find(item => item.id === itemId)
     },
+
+    isSnackbarActive: (state: State) => () => {
+      return !!state.snackbarText
+    }
   },
 
   mutations: {
@@ -65,6 +71,10 @@ export const store = new Vuex.Store<State>({
         ...state.items[data.collectionName] || [],
         ...data.items,
       ]*/
+    },
+
+    setSnackbarText (state: State, txt: string): void {
+      state.snackbarText = txt
     },
   },
 })

@@ -10,15 +10,18 @@
   },
   "dependencies": {
     "kg-shared": "^1.0.2",
+    "mousetrap": "^1.6.1",
     "vue": "^2.5.2",
     "vue-class-component": "^6.0.0",
     "vue-material": "^1.0.0-beta-8",
+    "vue-progressbar": "^0.7.3",
     "vue-property-decorator": "^6.0.0",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@naturalcycles/shared-dev": "^1.0.10",
+    "@types/mousetrap": "^1.6.0",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.22.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",

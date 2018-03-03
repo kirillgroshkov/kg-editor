@@ -12,6 +12,12 @@ export class BaseFieldComponent extends Vue {
   @Prop()
   value: any
 
+  @Prop()
+  focus: boolean | undefined
+
+  @Prop()
+  level: number | undefined
+
   updateValue (v: any) {
     // console.log('updateValue', v)
     this.$emit('input', v)

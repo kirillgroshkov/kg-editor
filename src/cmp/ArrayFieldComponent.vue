@@ -8,7 +8,7 @@
       </md-card-header-text>
 
       <md-menu md-size="big" md-direction="bottom-end" @click="toggleExpand">
-        <md-button class="md-icon-button" @click="toggleExpand">
+        <md-button class="md-icon-button" @click="toggleExpand" tabindex="-1">
           <md-icon>{{expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}</md-icon>
         </md-button>
       </md-menu>
@@ -44,11 +44,11 @@
         </md-card-actions>
       </md-card>
 
-      <pre>{{subItems}}</pre>
+      <pre v-if="debug">{{subItems}}</pre>
     </md-card-content>
 
     <md-card-actions md-alignment="left" v-show="expanded">
-      <md-button @click="addEmptySubItem">Add</md-button>
+      <md-button @click="addEmptySubItem" v-focus="focus">Add</md-button>
     </md-card-actions>
   </md-card>
 </template>
@@ -61,8 +61,9 @@ import { BaseFieldComponent } from './BaseFieldComponent';
 
 @Component
 export default class ArrayFieldComponent extends BaseFieldComponent {
+  debug = false
   expanded = true
-  expandedSubItem: number = null
+  expandedSubItem: number = -1
 
   get subItems (): any[] {
     // console.log('subItemssss', this.value)
@@ -75,7 +76,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     return subItems*/
   }
 
-  set subItems (v: any) {
+  set subItems (v: any[]) {
     // this.$emit('input', JSON.stringify(v || []))
     this.$emit('input', v || [])
   }
@@ -88,7 +89,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   toggleExpand () {
     this.expanded = !this.expanded
     if (!this.expanded) {
-      this.expandedSubItem = null
+      this.expandedSubItem = -1
     }
   }
 
@@ -99,7 +100,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   }
 
   onDone () {
-    this.expandedSubItem = null
+    this.expandedSubItem = -1
   }
 
   move (i: number, dir: number) {
@@ -109,7 +110,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   }
 
   addEmptySubItem () {
-    const emptyItem = schemaService.isObjectType(this.field.arrayOf) ? {} : undefined
+    const emptyItem = schemaService.isObjectType(this.field!.arrayOf!) ? {} : undefined
     const subItems = this.subItems
     subItems.push(emptyItem)
     this.subItems = subItems
@@ -117,7 +118,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     // console.log('exp: ' + this.expandedSubItem)
   }
 
-  removeSubItem (i) {
+  removeSubItem (i: number) {
     const subItems = this.subItems
     subItems.splice(i, 1)
     this.subItems = subItems
@@ -128,7 +129,7 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   }
 
   getSubField () {
-    const subType = this.$store.getters.getTypeByName(this.field.arrayOf)
+    const subType = this.$store.getters.getTypeByName(this.field!.arrayOf)
     // console.log('subType: ', subType)
     if (subType) {
       // for object types

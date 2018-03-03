@@ -3,30 +3,36 @@
   <div v-else>
     <md-button class="md-raised md-primary"
                style="margin-left: 0;"
-               @click="onSave"><md-icon>save</md-icon> Save</md-button>
-    <md-button class="md-raised md-transparent" @click="onCancel"><md-icon>cancel</md-icon> Cancel</md-button>
+               @click="onSave"
+    >Save (⌘+S)</md-button>
+    <md-button class="md-raised md-transparent"
+               @click="onExit"
+    >Exit (⌘←)</md-button>
 
     <form novalidate class="md-layout">
       <component
-        v-for="f in fields" :key="f.name"
+        v-for="(f, i) in fields" :key="f.name"
         v-bind:is="getFieldComponent(f.type)"
         av-model="item[f.name]"
         :value="item[f.name]"
         @input="updateSubItem($event, f.name)"
         :field="f"
+        :focus="i === focusedIndex"
+        :level="1"
       />
     </form>
     <pre>{{ item }}</pre>
-
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
+import { Progress } from '../decorators/progress.decorator';
 import { router } from '../router';
 import { apiService } from "../srv/api.service"
 import { Collection, Field, schemaService } from "../srv/schema.service"
+import { mousetrapUtil } from '../util/mousetrap.util';
 import { objectUtil } from '../util/object.util';
 
 @Component
@@ -37,7 +43,7 @@ export default class EditorPage extends Vue {
     return this.$store.getters.getCollectionByName(this.$route.params['collectionName'])
   }
 
-  get fields (): Field {
+  get fields (): Field[] {
     const type = this.collection.type
     return this.$store.getters.getTypeByName(type).fields
   }
@@ -50,12 +56,17 @@ export default class EditorPage extends Vue {
     return this.itemId === 'new'
   }
 
+  get focusedIndex (): number {
+    return this.fields.findIndex(f => !f.protected)
+  }
+
   item: any = null
 
   getFieldComponent (type: string) {
     return schemaService.getFieldComponent(type)
   }
 
+  @Progress()
   async mounted () {
     this.loading = 'loading...'
 
@@ -72,20 +83,29 @@ export default class EditorPage extends Vue {
     }
 
     this.loading = ''
+
+    mousetrapUtil.bind({
+      'command+s': () => this.onSave(),
+      'command+x': () => this.onExit(),
+      'command+left': () => this.onExit(),
+      'esc': () => this.onExit(),
+    })
   }
 
-  onCancel () {
+  destroyed () {
+    mousetrapUtil.unbind(['command+s', 'command+x', 'command+left', 'esc'])
+  }
+
+  onExit () {
+    // todo: check if modified
     router.push(`/collection/${this.collection.name}`)
   }
 
+  @Progress()
   async onSave () {
-    this.loading = 'saving...'
-
-    // router.push(`/collection/${this.collection.name}`)
     console.log('saving', JSON.stringify(this.item, null, 2))
     await apiService.saveItem(this.collection.name, this.item)
-    // alert('saved!')
-    router.push(`/collection/${this.collection.name}`)
+    // router.push(`/collection/${this.collection.name}`)
   }
 
   updateSubItem (v: any, fieldName: string) {

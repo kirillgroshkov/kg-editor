@@ -7,7 +7,7 @@
           md-label="Nothing found"
           :md-description="`No user found for this 'search' query. Try a different search term or create a new user.`"
         >
-          <md-button class="md-primary md-raised" :to="`/edit/${collection.name}/new`">Create New Item</md-button>
+          <md-button class="md-primary md-raised" @click="onCreate">Create New Item (⌘→)</md-button>
         </md-empty-state>
       </div>
 
@@ -19,9 +19,9 @@
         @md-selected="onSelect"
       >
         <md-table-toolbar v-if="items.length">
-          <md-button class="md-raised md-primary" :to="`/edit/${collection.name}/new`"><md-icon>add</md-icon> Create</md-button>
+          <md-button class="md-raised md-primary" @click="onCreate">Create (⌘→)</md-button>
 
-          <md-field md-clearable class="md-toolbar-section-end">
+          <md-field md-clearable class="md-toolbar-section-end" v-if="false">
             <md-input placeholder="Search..." data-model1="search" data-input1="searchOnTable" />
           </md-field>
         </md-table-toolbar>
@@ -55,8 +55,10 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Route } from "vue-router";
+import { router } from '../router';
 import { apiService } from "../srv/api.service"
 import { Collection, Field } from "../srv/schema.service"
+import { mousetrapUtil } from '../util/mousetrap.util';
 
 @Component
 export default class CollectionPage extends Vue {
@@ -104,8 +106,21 @@ export default class CollectionPage extends Vue {
     this.loadingTxt = ''
   }
 
+  onCreate () {
+    router.push(`/edit/${this.collection.name}/new`)
+  }
+
   async mounted () {
     this.init(this.$route.params['collectionName'])
+
+    mousetrapUtil.bind({
+      // 'command+b': () => this.onCreate(),
+      'command+right': () => this.onCreate(),
+    })
+  }
+
+  destroyed () {
+    mousetrapUtil.unbind(['command+b', 'command+right'])
   }
 
   async init (collectionName: string) {

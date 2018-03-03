@@ -1,1 +1,1 @@
-module.exports = require('node_modules/kg-dev/prettier.config')
+module.exports = require('@naturalcycles/shared-dev/prettier.config')

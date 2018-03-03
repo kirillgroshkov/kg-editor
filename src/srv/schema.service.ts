@@ -32,7 +32,8 @@ export interface Field {
   name: string
   label: string
   type: string
-  required: boolean
+  required?: boolean
+  protected?: boolean
 
   minLength?: number
   maxLength?: number

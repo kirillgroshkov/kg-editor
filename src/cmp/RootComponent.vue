@@ -1,6 +1,9 @@
 <template>
   <div>
+    <vue-progress-bar></vue-progress-bar>
+
     <pre v-if="loading">{{loading}}</pre>
+
     <LayoutComponent v-else></LayoutComponent>
   </div>
 </template>
