@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="md-layout-item md-layout">
     <md-empty-state
       md-icon="devices_other"
       md-label="Welcome to kg-editor!"

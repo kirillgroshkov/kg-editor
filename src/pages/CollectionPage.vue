@@ -1,8 +1,9 @@
 <template>
-  <div>
+  <div class="md-layout-item md-layout">
     <pre v-if="loading || loadingTxt">loading...</pre>
+
     <template v-else>
-      <div v-if="!items.length">
+      <div v-if="!items.length" class="md-layout-item md-layout">
         <md-empty-state
           md-label="Nothing found"
           :md-description="`No user found for this 'search' query. Try a different search term or create a new user.`"
@@ -13,9 +14,10 @@
 
       <md-table
         v-else
+        class="md-layout-item md-layout"
         v-model="items"
         :md-sort.sync="currentSort" :md-sort-order.sync="currentSortOrder" :md-sort-fn="customSort"
-        md-fixed-header
+        amd-fixed-header
         @md-selected="onSelect"
       >
         <md-table-toolbar v-if="items.length">
@@ -55,6 +57,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Route } from "vue-router";
+import { Progress } from '../decorators/progress.decorator';
 import { router } from '../router';
 import { apiService } from "../srv/api.service"
 import { Collection, Field } from "../srv/schema.service"
@@ -123,6 +126,7 @@ export default class CollectionPage extends Vue {
     mousetrapUtil.unbind(['command+b', 'command+right'])
   }
 
+  @Progress()
   async init (collectionName: string) {
     console.log('init: ' + collectionName)
     await apiService.getItems(collectionName)
@@ -169,5 +173,10 @@ export default class CollectionPage extends Vue {
   .md-toolbar-section-end {
     max-width: 200px;
     // background-color: red !important;
+  }
+  .md-table-content {
+    // display: flex !important;
+    // height: auto !important;
+    // max-height: auto !important;
   }
 </style>

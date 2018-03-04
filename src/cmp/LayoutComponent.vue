@@ -1,5 +1,4 @@
 <template>
-  <div>
   <md-app>
     <md-app-toolbar class="md-primary">
       <span class="md-title">{{ $store.state.title }}</span>
@@ -9,6 +8,11 @@
       <md-toolbar class="md-transparent" md-elevation="0">Collections</md-toolbar>
 
       <md-list>
+        <md-list-item :to="`/`">
+          <md-icon>home</md-icon>
+          <span class="md-list-item-text">Home</span>
+        </md-list-item>
+
         <md-list-item
           v-for="c in $store.state.schema.collections" :key="c.name"
           @click="openCollection(c)"
@@ -20,11 +24,10 @@
       </md-list>
     </md-app-drawer>
 
-    <md-app-content>
+    <md-app-content class="md-layout">
       <router-view></router-view>
     </md-app-content>
   </md-app>
-  </div>
 </template>
 
 <script lang="ts">
@@ -57,12 +60,16 @@ export default class LayoutComponent extends Vue {
   }
 
   .md-app {
+    min-height: 100vh;
     // display: none;
     // max-height: 400px;
     border: 1px solid rgba(#000, .12);
   }
 
-  // Demo purposes only
+  .md-app-content {
+    // min-height: 100vh;
+  }
+
   .md-drawer {
     // width: 230px;
     width: 180px;
