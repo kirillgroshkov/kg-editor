@@ -33,6 +33,7 @@ export interface Field {
   label: string
   type: string
   descr?: string
+  def?: any
   required?: boolean
   protected?: boolean
 
@@ -87,7 +88,12 @@ class SchemaService {
       // object type
       const o: any = {}
       t.fields.forEach(f => {
-        o[f.name] = this.getEmptyValueByType(f.type)
+        if (f.def !== undefined) {
+          // todo: validate (e.g number, or boolean)
+          o[f.name] = f.def
+        } else {
+          o[ f.name ] = this.getEmptyValueByType(f.type)
+        }
       })
       return o
     }
