@@ -36,6 +36,15 @@ export default class StringFieldComponent extends BaseFieldComponent {
 </script>
 
 <style lang="scss" scoped>
+  .short {
+    width: 400px;
+    max-width: 400px;
+  }
+
+  .md-field {
+    margin-bottom: 32px;
+  }
+
   .md-input {
     transition: background-color .3s ease-in-out;
 

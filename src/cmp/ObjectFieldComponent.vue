@@ -1,6 +1,6 @@
 <template>
-  <md-card :md-with-hover="!expanded" class="card" :class="{deep: level > 1}">
-    <md-card-header>
+  <md-card :md-with-hover="!expanded" class="card" :class="{deep: level > 1, root: isRootLevel}">
+    <md-card-header v-if="level > 0">
       <md-card-header-text class="md-layout">
         <div style="padding-top: 6px; padding-right: 16px;">
           <div class="md-title" :class="inputClass">{{field.label}}</div>
@@ -15,6 +15,13 @@
             :disabled="!saveEnabled"
             v-if="saveEnabled"
           >Save</md-button>
+
+          <md-button
+            class="md-raised md-dense"
+            av-focus="focus"
+            @click="onCancel"
+            v-if="saveEnabled"
+          >Cancel</md-button>
         </div>
       </md-card-header-text>
 
@@ -34,6 +41,7 @@
         :originalValue="(originalValue || {})[f.name]"
         :forceDirty="forceDirty || localForceDirty"
         :level="level + 1"
+        :focus="f.name === focusedFieldName"
         @input="updateSubItem($event, f.name)"
         @valid="updateSubItemValid($event, f.name)"
         />
@@ -45,7 +53,7 @@
 
 <script lang="ts">
 import Component from 'vue-class-component'
-import { Field, schemaService } from "../srv/schema.service"
+import { Field, schemaService, SchemaType } from "../srv/schema.service"
 import { BaseFieldComponent } from './BaseFieldComponent';
 
 @Component
@@ -55,7 +63,7 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
   validationState: {[f: string]: boolean} = {}
   localForceDirty = false
 
-  get subType (): Field {
+  get subType (): SchemaType {
     // console.log('subType: ' + this.field!.type)
     return this.$store.getters.getTypeByName(this.field!.type)
   }
@@ -83,13 +91,26 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
     return !this.$store.state.ghostMode && this.valueChanged && (this.valid || !this.forceDirty || !this.localForceDirty)
   }
 
+  get isRootLevel (): boolean {
+    return this.level === 0
+  }
+
+  get focusedFieldName (): string | undefined {
+    const f = this.subType.fields.find(f => !f.protected)
+    return f ? f.name : undefined
+  }
+
   mounted () {
     this.emitValidationState()
   }
 
   toggleExpand () {
-    if (this.level! > 1) {
-      this.$emit('objectCollapsed')
+    if (this.inArray) {
+      if (this.valueChanged) {
+        this.onSave()
+      } else {
+        this.onCancel()
+      }
     } else {
       this.expanded = !this.expanded
     }
@@ -125,17 +146,31 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
 
     this.$emit('objectCollapsed')
   }
+
+  onCancel () {
+    this.$emit('objectCancelled')
+  }
 }
 </script>
 
 <style lang="scss" scoped>
   .card {
-    width: 100%; max-width: 600px;
+    width: 100%;
+    max-width: 600px;
     margin-bottom: 10px;
     margin-left: 0;
     margin-right: 0;
 
     &.deep {
+      box-shadow: none !important;
+      margin-left: -16px;
+      margin-right: -16px;
+      margin-bottom: 0;
+    }
+
+    &.root {
+      max-width: none;
+      width: auto;
       box-shadow: none !important;
       margin-left: -16px;
       margin-right: -16px;
@@ -152,6 +187,10 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
     &.changed {
       background-color: rgba(0, 0, 0, 0.1);
     }
+  }
+
+  .md-subhead {
+    font-size: 12px;
   }
 
   .md-card-content {

@@ -32,6 +32,7 @@ export interface Field {
   name: string
   label: string
   type: string
+  descr?: string
   required?: boolean
   protected?: boolean
 

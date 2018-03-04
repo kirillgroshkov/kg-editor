@@ -40,9 +40,11 @@
               :originalValue="(originalValue || {})[expandedSubItem]"
               :level="level + 1"
               :forceDirty="forceDirty"
+              :inArray="true"
               @input="updateSubItem($event, expandedSubItem)"
               @valid="updateSubItemValid($event, expandedSubItem)"
               @objectCollapsed="collapseSubItem"
+              @objectCancelled="cancelSubItem"
             />
           </div>
         </md-card-content>
@@ -181,6 +183,11 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   collapseSubItem () {
     this.expandedSubItem = -1
   }
+
+  cancelSubItem () {
+    this.removeSubItem(this.expandedSubItem)
+    this.expandedSubItem = -1
+  }
 }
 </script>
 
@@ -197,7 +204,12 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   }
 
   .card {
-    width: 100%; max-width: 600px; margin-bottom: 20px; margin-left: 0; margin-right: 0;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: none !important;
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-bottom: 12px;
   }
 
   .card-subitem {
@@ -210,6 +222,10 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
 
   .md-card-content {
     padding-bottom: 8px;
+  }
+
+  .md-subhead {
+    font-size: 12px;
   }
 
   .md-card-actions {

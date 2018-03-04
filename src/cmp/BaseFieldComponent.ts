@@ -20,6 +20,9 @@ export class BaseFieldComponent extends Vue {
   level: number | undefined
 
   @Prop()
+  inArray: boolean | undefined
+
+  @Prop()
   forceDirty: boolean | undefined
 
   dirty = false

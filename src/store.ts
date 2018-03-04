@@ -1,5 +1,5 @@
 import { Dialog } from '@/srv/dialog.service'
-import { AppSchema } from '@/srv/schema.service'
+import { AppSchema, SchemaType } from '@/srv/schema.service'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -33,7 +33,7 @@ export const store = new Vuex.Store<State>({
       return state.schema.collections.find(c => c.name === name)
     },
 
-    getTypeByName: (state: State) => (name: string) => {
+    getTypeByName: (state: State) => (name: string): SchemaType | undefined => {
       return state.schema.types.find(c => c.name === name)
     },
 

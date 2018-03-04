@@ -1,32 +1,33 @@
 <template>
   <pre v-if="loading">{{loading}}</pre>
-  <div v-else>
-    <md-button class="md-raised md-primary"
-               style="margin-left: 0;"
-               :disabled="!saveEnabled"
-               @click="onSave(true)"
-    >Save (⌘+S)</md-button>
+  <div v-else class="md-layout-item md-alignment-top-left1">
+    <div class="md-layout-item md-layout buttons">
+      <md-button class="md-raised md-primary md-layout-item1"
+                 style="margin-left: 0;"
+                 :disabled="!saveEnabled"
+                 @click="onSave(true)"
+      >Save (⌘+S)</md-button>
 
-    <md-button class="md-raised md-transparent"
-               :disabled="!exitEnabled"
-               @click="onExit"
-    >Exit (⌘←)</md-button>
+      <md-button class="md-raised md-transparent md-layout-item1"
+                 :disabled="!exitEnabled"
+                 @click="onExit"
+      >Exit (⌘←)</md-button>
+    </div>
 
+    <div class="mainEditor">
       <component
-        v-for="(f, i) in fields" :key="f.name"
-        v-bind:is="getFieldComponent(f.type)"
-        :value="item[f.name]"
-        :originalValue="originalItem[f.name]"
+        v-bind:is="getFieldComponent(collection.type)"
+        :value="item"
+        :originalValue="originalItem"
         :forceDirty="forceDirty"
-        @input="updateSubItem($event, f.name)"
-        @valid="updateSubItemValid($event, f.name)"
-        :field="f"
-        :focus="i === focusedIndex"
-        :level="1"
+        :field="field"
+        :level="0"
+        @input="updateItem"
+        @valid="updateItemValid"
       />
 
-    <pre v-if="debug">item: {{ item }}</pre>
-    <pre v-if="debug">validationState ({{valid}}): {{ validationState }}</pre>
+      <pre v-if="debug" class="debug">item (valid={{valid}}): {{ item }}</pre>
+    </div>
   </div>
 </template>
 
@@ -37,36 +38,50 @@ import { Progress } from '../decorators/progress.decorator';
 import { router } from '../router';
 import { apiService } from "../srv/api.service"
 import { dialogService } from '../srv/dialog.service';
-import { Collection, Field, schemaService } from "../srv/schema.service"
+import { Collection, Field, schemaService, SchemaType } from "../srv/schema.service"
 import { mousetrapUtil } from '../util/mousetrap.util';
 import { objectUtil } from '../util/object.util';
 
 @Component
 export default class EditorPage extends Vue {
   loading = 'loading...'
-  validationState: {[f: string]: boolean} = {}
+  valid = false
   forceDirty = false
   debug = true
+
+  item: any = null
+
+  // this is what is saved to db
+  originalItem: any = null
 
   get collection (): Collection {
     return this.$store.getters.getCollectionByName(this.$route.params['collectionName'])
   }
 
-  get fields (): Field[] {
-    const type = this.collection.type
-    return this.$store.getters.getTypeByName(type).fields
+  get typeName (): string {
+    return this.collection.type
+  }
+
+  get type (): SchemaType {
+    return this.$store.getters.getTypeByName(this.typeName)
+  }
+
+  get field (): Field {
+    // create Field based on Collection information we have
+    return {
+      name: this.collection.type,
+      label: this.type.label,
+      type: this.collection.type,
+      // descr: 'descrrrr',
+    }
   }
 
   get itemId (): string {
     return this.$route.params['itemId']
   }
 
-  get newItem (): boolean {
+  get isNewItem (): boolean {
     return this.itemId === 'new'
-  }
-
-  get focusedIndex (): number {
-    return this.fields.findIndex(f => !f.protected)
   }
 
   get valueChanged (): boolean {
@@ -81,17 +96,6 @@ export default class EditorPage extends Vue {
     return !this.$store.state.ghostMode
   }
 
-  get valid (): boolean {
-    return Object.keys(this.validationState)
-      .map(k => this.validationState[k])
-      .find(v => !v) === undefined
-  }
-
-  item: any = null
-
-  // this is what is saved to db
-  originalItem: any = null
-
   getFieldComponent (type: string) {
     return schemaService.getFieldComponent(type)
   }
@@ -101,7 +105,7 @@ export default class EditorPage extends Vue {
     this.loading = 'loading...'
 
     // console.log('mounted! ' + this.itemId)
-    if (this.newItem) {
+    if (this.isNewItem) {
       // this.originalItem = {__original: true}
       this.item = schemaService.getEmptyValueByType(this.collection.type) || {}
       this.originalItem = objectUtil.deepCopy(this.item)
@@ -177,40 +181,30 @@ export default class EditorPage extends Vue {
     }
   }
 
-  updateSubItem (v: any, fieldName: string) {
+  updateItem (v: any) {
     // console.log(`updateSubItem editor ${fieldName}`, v)
 
-    // Vue.set(this.item, fieldName, v)
-    this.item = {
-      ...this.item,
-      [fieldName]: objectUtil.deepCopy(v),
-    }
+    this.item = objectUtil.deepCopy(v)
   }
 
-  updateSubItemValid (valid: boolean, fieldName: string) {
+  updateItemValid (valid: boolean) {
     // console.log(`updateSubItemValid editor ${fieldName}`, valid)
 
-    // Vue.nextTick(() => this.validationState[fieldName] = valid)
-    this.validationState = {
-      ...this.validationState,
-      [fieldName]: valid,
-    }
-
-    // Vue.set(this.item, fieldName, v)
-    /*this.item = {
-      ...this.item,
-      [fieldName]: objectUtil.deepCopy(v),
-    }*/
+    this.valid = valid
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  form {
-    max-width: 790px;
+  .mainEditor {
+    // max-width: 600px;
   }
   .short {
     width: 400px;
     max-width: 400px;
+  }
+
+  pre.debug {
+    margin-top: 0;
   }
 </style>
