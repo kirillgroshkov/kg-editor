@@ -79,6 +79,25 @@ class SchemaService {
     return DEF_FIELD_COMP
   }
 
+  validateField (f: Field, o: any): string[] {
+    const e: string[] = []
+
+    if (f.required) {
+      // todo: support array and object types
+      if (!o) e.push(`required`)
+    }
+
+    if (f.minLength) {
+      if (o && o.length < f.minLength) e.push(`should be longer than ${f.minLength}`)
+    }
+
+    if (f.maxLength) {
+      if (o && o.length > f.maxLength) e.push(`should be shorter than ${f.minLength}`)
+    }
+
+    return e
+  }
+
   // mutates
   completeSchema (s: AppSchema): void {
     s.types.forEach(t => this.completeType(t))
@@ -91,6 +110,7 @@ class SchemaService {
       Object.assign(f, {
         type: 'id',
         label: 'id',
+        required: true,
         maxLength: f.maxLength || 16,
       })
     }

@@ -40,9 +40,11 @@ class BootstrapService {
   private initDecorators (): void {
     initProgressDecorator({
       beforeFn () {
+        store.commit('setGhost')
         app.$Progress.start()
       },
       okFn (r) {
+        store.commit('setGhost', false)
         let cls: string = r.target && r.target.constructor && r.target.constructor.name
         if (cls) cls += '.'
         let args: string = (r.args && r.args.length) ? JSON.stringify(r.args) + ' ' : ''
@@ -50,6 +52,7 @@ class BootstrapService {
         app.$Progress.finish()
       },
       errorFn (err) {
+        store.commit('setGhost', false)
         app.$Progress.fail()
         alert(JSON.stringify(err, undefined, 2))
         return Promise.reject(err)

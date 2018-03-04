@@ -3,9 +3,12 @@
   <div v-else>
     <md-button class="md-raised md-primary"
                style="margin-left: 0;"
-               @click="onSave"
+               :disabled="!saveEnabled"
+               @click="onSave(true)"
     >Save (⌘+S)</md-button>
+
     <md-button class="md-raised md-transparent"
+               :disabled="!exitEnabled"
                @click="onExit"
     >Exit (⌘←)</md-button>
 
@@ -13,15 +16,19 @@
       <component
         v-for="(f, i) in fields" :key="f.name"
         v-bind:is="getFieldComponent(f.type)"
-        av-model="item[f.name]"
         :value="item[f.name]"
+        :originalValue="originalItem[f.name]"
+        :forceDirty="forceDirty"
         @input="updateSubItem($event, f.name)"
+        @valid="updateSubItemValid($event, f.name)"
         :field="f"
         :focus="i === focusedIndex"
         :level="1"
       />
     </form>
-    <pre>{{ item }}</pre>
+
+    <pre>item: {{ item }}</pre>
+    <pre>validationState ({{valid}}): {{ validationState }}</pre>
   </div>
 </template>
 
@@ -31,6 +38,7 @@ import Component from 'vue-class-component'
 import { Progress } from '../decorators/progress.decorator';
 import { router } from '../router';
 import { apiService } from "../srv/api.service"
+import { dialogService } from '../srv/dialog.service';
 import { Collection, Field, schemaService } from "../srv/schema.service"
 import { mousetrapUtil } from '../util/mousetrap.util';
 import { objectUtil } from '../util/object.util';
@@ -38,6 +46,8 @@ import { objectUtil } from '../util/object.util';
 @Component
 export default class EditorPage extends Vue {
   loading = 'loading...'
+  validationState: {[f: string]: boolean} = {}
+  forceDirty = false
 
   get collection (): Collection {
     return this.$store.getters.getCollectionByName(this.$route.params['collectionName'])
@@ -60,7 +70,26 @@ export default class EditorPage extends Vue {
     return this.fields.findIndex(f => !f.protected)
   }
 
+  get valueChanged (): boolean {
+    return !objectUtil.deepEquals(this.item, this.originalItem)
+  }
+
+  get saveEnabled (): boolean {
+    return !this.$store.state.ghostMode && this.valueChanged && (this.valid || !this.forceDirty)
+  }
+
+  get exitEnabled (): boolean {
+    return !this.$store.state.ghostMode
+  }
+
+  get valid (): boolean {
+    return Object.values(this.validationState).find(v => !v) === undefined
+  }
+
   item: any = null
+
+  // this is what is saved to db
+  originalItem: any = null
 
   getFieldComponent (type: string) {
     return schemaService.getFieldComponent(type)
@@ -72,6 +101,7 @@ export default class EditorPage extends Vue {
 
     // console.log('mounted! ' + this.itemId)
     if (this.newItem) {
+      this.originalItem = {__original: true}
       this.item = {} // tada: put default values for each field
     } else {
       this.item = this.$store.getters.getItem(this.collection.name, this.itemId)
@@ -80,6 +110,7 @@ export default class EditorPage extends Vue {
         this.item = this.$store.getters.getItem(this.collection.name, this.itemId)
         if (!this.item) alert('item not found!')
       }
+      this.originalItem = objectUtil.deepCopy(this.item)
     }
 
     this.loading = ''
@@ -96,16 +127,51 @@ export default class EditorPage extends Vue {
     mousetrapUtil.unbind(['command+s', 'command+x', 'command+left', 'esc'])
   }
 
-  onExit () {
-    // todo: check if modified
+  async onExit () {
+    if (this.valueChanged) {
+      const confirm = await dialogService.dialog({
+        title: 'Unsaved changes',
+        content: 'There are unsaved changes, are you sure you want to leave them?',
+        textOk: 'Leave',
+        textCancel: 'Stay',
+      })
+      if (!confirm) return
+    }
+
+    if (!this.exitEnabled) return
+    this.doExit()
+  }
+
+  doExit () {
     router.push(`/collection/${this.collection.name}`)
   }
 
+  async onSave (exit = false) {
+    if (!this.saveEnabled) return
+
+    // Validate before saving
+    if (!this.valid) {
+      this.forceDirty = true
+      return
+    }
+
+    await this.doSave()
+    if (exit) this.doExit()
+  }
+
   @Progress()
-  async onSave () {
+  async doSave () {
     console.log('saving', JSON.stringify(this.item, null, 2))
-    await apiService.saveItem(this.collection.name, this.item)
-    // router.push(`/collection/${this.collection.name}`)
+    const _originalItem = objectUtil.deepCopy(this.originalItem)
+
+    try {
+      this.originalItem = objectUtil.deepCopy(this.item)
+      await apiService.saveItem(this.collection.name, this.item)
+      // router.push(`/collection/${this.collection.name}`)
+    } catch (err) {
+      this.originalItem = _originalItem // revert
+      throw err
+    }
   }
 
   updateSubItem (v: any, fieldName: string) {
@@ -116,6 +182,22 @@ export default class EditorPage extends Vue {
       ...this.item,
       [fieldName]: objectUtil.deepCopy(v),
     }
+  }
+
+  updateSubItemValid (valid: boolean, fieldName: string) {
+    console.log(`updateSubItemValid editor ${fieldName}`, valid)
+
+    // Vue.nextTick(() => this.validationState[fieldName] = valid)
+    this.validationState = {
+      ...this.validationState,
+      [fieldName]: valid,
+    }
+
+    // Vue.set(this.item, fieldName, v)
+    /*this.item = {
+      ...this.item,
+      [fieldName]: objectUtil.deepCopy(v),
+    }*/
   }
 }
 </script>

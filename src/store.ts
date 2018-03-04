@@ -1,3 +1,4 @@
+import { Dialog } from '@/srv/dialog.service'
 import { AppSchema } from '@/srv/schema.service'
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -5,9 +6,11 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export interface State {
+  ghostMode: boolean
   title: string
   project: string
   snackbarText: string
+  dialog: Dialog | null,
   schema: AppSchema
   activeCollection: string
   items: { [collectionName: string]: any[] }
@@ -15,9 +18,11 @@ export interface State {
 
 export const store = new Vuex.Store<State>({
   state: {
+    ghostMode: false,
     title: 'Home',
     project: 'innocent',
     snackbarText: '',
+    dialog: null,
     schema: { collections: [], types: [] },
     activeCollection: '',
     items: {},
@@ -75,6 +80,14 @@ export const store = new Vuex.Store<State>({
 
     setSnackbarText (state: State, txt: string): void {
       state.snackbarText = txt
+    },
+
+    setGhost (state: State, ghostMode = true): void {
+      state.ghostMode = ghostMode
+    },
+
+    setDialog (state: State, dialog?: Dialog): void {
+      state.dialog = dialog || null
     },
   },
 })

@@ -1,3 +1,5 @@
+import '@/scss/global.scss'
+import '@/polyfills'
 import Vue from 'vue'
 import './hooks' // must be defined BEFORE router is created!
 import { router } from '@/router'
@@ -5,6 +7,9 @@ import { store } from '@/store'
 import RootComponent from './cmp/RootComponent.vue'
 
 Vue.config.productionTip = false
+
+// Directives
+import '@/dir/focus.dir'
 
 // Material
 import VueMaterial from 'vue-material'
@@ -24,8 +29,6 @@ Vue.use(VueProgressBar, {
     termination: 300,
   },
 })
-
-import '@/dir/focus.dir'
 
 export const app = new Vue({
   router,

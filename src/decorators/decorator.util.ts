@@ -1,13 +1,8 @@
-type PromiseFunction = (...args: any[]) => any
-
 type PromiseDecoratorFunction = (
   target: any,
   propertyKey: string,
   pd: PropertyDescriptor,
-  // pd: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>,
-// ) => TypedPropertyDescriptor<(...args: any[]) => Promise<any>>
 ) => PropertyDescriptor
-// export type PromiseDecoratorFactory = (...args: any[]) => PromiseDecoratorFunction
 
 export interface PromiseDecoratorCfg {
   decoratorName: string
@@ -35,7 +30,6 @@ export function createPromiseDecorator (
   return function DecoratorFunction (
     target: any,
     propertyKey: string,
-    // pd: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>,
     pd: PropertyDescriptor,
   ): PropertyDescriptor {
     // console.log(`@Decorator.${cfg.decoratorName} called: ` + propertyKey, pd, target)
