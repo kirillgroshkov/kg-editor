@@ -12,7 +12,6 @@
                @click="onExit"
     >Exit (⌘←)</md-button>
 
-    <form novalidate class="md-layout">
       <component
         v-for="(f, i) in fields" :key="f.name"
         v-bind:is="getFieldComponent(f.type)"
@@ -25,7 +24,6 @@
         :focus="i === focusedIndex"
         :level="1"
       />
-    </form>
 
     <pre v-if="debug">item: {{ item }}</pre>
     <pre v-if="debug">validationState ({{valid}}): {{ validationState }}</pre>
@@ -48,7 +46,7 @@ export default class EditorPage extends Vue {
   loading = 'loading...'
   validationState: {[f: string]: boolean} = {}
   forceDirty = false
-  debug = false
+  debug = true
 
   get collection (): Collection {
     return this.$store.getters.getCollectionByName(this.$route.params['collectionName'])

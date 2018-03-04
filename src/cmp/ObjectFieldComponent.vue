@@ -1,5 +1,5 @@
 <template>
-  <md-card :md-with-hover="!expanded" class="card deep">
+  <md-card :md-with-hover="!expanded" class="card" :class="{deep: level > 1}">
     <md-card-header>
       <md-card-header-text class="md-layout">
         <div style="padding-top: 6px; padding-right: 16px;">
