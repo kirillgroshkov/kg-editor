@@ -1,62 +1,81 @@
 <template>
-  <md-card :md-with-hover="!expanded"
-           style="width: 100%; max-width: 600px; margin-bottom: 20px; margin-left: 0; margin-right: 0;">
-    <md-card-header @click.native="toggleExpand">
-      <md-card-header-text>
-        <div class="md-title" @click.native="toggleExpand">{{field.label}} ({{subItems.length}})</div>
-        <div class="md-subhead" v-if="field.descr">{{field.descr}}</div>
+  <md-card :md-with-hover="!expanded" class="card">
+    <md-card-header aclick.native="toggleExpand">
+      <md-card-header-text class="md-layout">
+        <div style="padding-top: 6px; padding-right: 16px;">
+          <div class="md-title" :class="inputClass">{{field.label}} ({{subItems.length}})</div>
+          <div class="md-subhead" v-if="field.descr">{{field.descr}}</div>
+        </div>
+
+        <div class="md-layout-item" style="padding-top: 2px;">
+          <md-button
+            class="md-raised md-dense"
+            v-focus="focus"
+            @click="addEmptySubItem"
+            v-show="expandedSubItem === -1"
+          >Add</md-button>
+        </div>
       </md-card-header-text>
 
-      <md-menu md-size="big" md-direction="bottom-end" @click="toggleExpand">
+      <md-menu md-size="big" md-direction="bottom-end" v-show="subItems.length && expandedSubItem === -1">
         <md-button class="md-icon-button" @click="toggleExpand" tabindex="-1">
           <md-icon>{{expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}</md-icon>
         </md-button>
       </md-menu>
     </md-card-header>
 
-    <md-card-content v-show="expanded">
+    <md-card-content v-show="expanded && subItems.length">
+      <!-- Expanded item -->
+      <md-card v-if="expandedSubItem > -1"
+               class="card-subitem"
+      >
+        <md-card-content class="md-layout">
+          <div class="md-layout-item md-size-100 md-layout md-alignment-center-left">
+            <component
+              v-bind:is="getFieldComponent(field.arrayOf)"
+              :field="getSubField()"
+              :value="subItems[expandedSubItem]"
+              :originalValue="(originalValue || {})[expandedSubItem]"
+              :level="level + 1"
+              :forceDirty="forceDirty"
+              @input="updateSubItem($event, expandedSubItem)"
+              @valid="updateSubItemValid($event, expandedSubItem)"
+              @objectCollapsed="collapseSubItem"
+            />
+          </div>
+        </md-card-content>
+      </md-card>
+
+      <!-- Array of collapsed items -->
       <md-card :md-with-hover="expandedSubItem !== i"
                class="card-subitem"
+               v-else
                v-for="(subItem, i) in subItems" :key="subItem ? subItem.id : i"
       >
         <md-card-content class="md-layout" @click.native="expandSubItem(i)">
-          <div class="md-layout-item md-size-100 md-layout md-alignment-center-center" v-if="expandedSubItem !== i">
+          <div class="md-layout-item md-size-100 md-layout md-alignment-center-center">
             <div class="md-layout-item">
               {{subItem || 'empty'}}
             </div>
+
             <md-button class="md-icon-button" @click.stop="move(i, -1)" :disabled="i === 0"><md-icon>keyboard_arrow_up</md-icon></md-button>
             <md-button class="md-icon-button" @click.stop="move(i, 1)" :disabled="i === subItems.length-1"><md-icon>keyboard_arrow_down</md-icon></md-button>
             <md-button class="md-icon-button" @click.stop="removeSubItem(i)"><md-icon>delete</md-icon></md-button>
           </div>
-
-          <div class="md-layout-item md-size-100 md-layout md-alignment-center-left" v-if="expandedSubItem === i">
-            <component
-              v-bind:is="getFieldComponent(field.arrayOf)"
-              :field="getSubField()"
-              :value="subItems[i]"
-              @input="updateSubItem($event, i)"
-            />
-          </div>
         </md-card-content>
-
-        <md-card-actions md-alignment="left" v-if="expandedSubItem === i">
-          <md-button @click="onDone">Done</md-button>
-        </md-card-actions>
       </md-card>
 
-      <pre v-if="debug">{{subItems}}</pre>
+      <pre v-if="debug">valid={{valid}} {{subItems}}</pre>
     </md-card-content>
-
-    <md-card-actions md-alignment="left" v-show="expanded">
-      <md-button @click="addEmptySubItem" v-focus="focus">Add</md-button>
-    </md-card-actions>
   </md-card>
 </template>
 
 <script lang="ts">
 import Component from 'vue-class-component'
+import Vue from "vue"
 import { schemaService } from '../srv/schema.service';
 import { arrayUtil } from '../util/array.util';
+import { objectUtil } from '../util/object.util';
 import { BaseFieldComponent } from './BaseFieldComponent';
 
 @Component
@@ -64,21 +83,15 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   debug = false
   expanded = true
   expandedSubItem: number = -1
+  validationState: {[f: string]: boolean} = {}
 
   get subItems (): any[] {
-    // console.log('subItemssss', this.value)
     return this.value || []
-    /*
-    // const a = this.item[this.field!.name]
-    const a = this.value
-    if (!a) return []
-    const subItems = JSON.parse(a)
-    return subItems*/
   }
 
   set subItems (v: any[]) {
-    // this.$emit('input', JSON.stringify(v || []))
     this.$emit('input', v || [])
+    this.emitValidationState()
   }
 
   get fieldComponent () {
@@ -86,7 +99,12 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     return schemaService.getFieldComponent(subType)
   }
 
+  get valueChanged (): boolean {
+    return !objectUtil.deepEquals(this.value, this.originalValue)
+  }
+
   toggleExpand () {
+    // alert('toggle')
     this.expanded = !this.expanded
     if (!this.expanded) {
       this.expandedSubItem = -1
@@ -99,10 +117,6 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     this.expandedSubItem = i
   }
 
-  onDone () {
-    this.expandedSubItem = -1
-  }
-
   move (i: number, dir: number) {
     const subItems = this.subItems
     arrayUtil.arrayMove(subItems, i, i + dir)
@@ -110,12 +124,14 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   }
 
   addEmptySubItem () {
-    const emptyItem = schemaService.isObjectType(this.field!.arrayOf!) ? {} : undefined
-    const subItems = this.subItems
-    subItems.push(emptyItem)
-    this.subItems = subItems
-    this.expandedSubItem = subItems.length - 1
-    // console.log('exp: ' + this.expandedSubItem)
+    // const emptyItem = schemaService.isObjectType(this.field!.arrayOf!) ? {} : undefined
+    const emptyItem = schemaService.getEmptyValueByType(this.field!.arrayOf!) || undefined
+    this.subItems = [
+      emptyItem,
+      ...this.subItems,
+    ]
+
+    this.expandedSubItem = 0
   }
 
   removeSubItem (i: number) {
@@ -141,6 +157,18 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     return this.field
   }
 
+  get valueChanged (): boolean {
+    return !objectUtil.deepEquals(this.value, this.originalValue)
+  }
+
+  get valid (): boolean {
+    return Object.values(this.validationState).find(v => !v) === undefined
+  }
+
+  mounted () {
+    this.emitValidationState()
+  }
+
   updateSubItem (v: any, i: any) {
     // console.log('updateSubItem arr [' + i + ']', v)
 
@@ -148,15 +176,52 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     subItems[i] = v
     this.subItems = subItems
   }
+
+  updateSubItemValid (valid: boolean, index: number) {
+    // console.log(`updateSubItemValid array ${index}`, valid)
+
+    this.validationState = {
+      ...this.validationState,
+      [index]: valid,
+    }
+    this.emitValidationState()
+  }
+
+  collapseSubItem () {
+    this.expandedSubItem = -1
+  }
 }
 </script>
 
 <style lang="scss" scoped>
+  .md-title {
+    font-size: 14px !important;
+    line-height: 26px !important;
+    // font-weight: normal !important;
+    transition: background-color .3s ease-in-out;
+
+    &.changed {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .card {
+    width: 100%; max-width: 600px; margin-bottom: 20px; margin-left: 0; margin-right: 0;
+  }
+
   .card-subitem {
     margin: 0;
     // padding: 0;
     .md-card-content {
       padding: 8px 0 8px 16px;
     }
+  }
+
+  .md-card-content {
+    padding-bottom: 8px;
+  }
+
+  .md-card-actions {
+    padding: 0 !important;
   }
 </style>

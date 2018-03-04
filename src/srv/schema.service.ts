@@ -54,12 +54,13 @@ const TYPE_MAP: {[type: string]: any} = {
 
 const EMPTY_ITEM_MAP: {[type: string]: () => any} = {
   boolean: () => false,
+  id: () => '',
   string: () => '',
+  text: () => '',
+  array: () => [],
+  number: () => undefined,
   // date: DateFieldComponent,
-  // text: TextFieldComponent,
-  // number: NumberFieldComponent,
   // object: ObjectFieldComponent,
-  // array: ArrayFieldComponent,
 }
 
 const DEF_FIELD_COMP = StringFieldComponent
@@ -77,6 +78,20 @@ class SchemaService {
     if (this.isObjectType(type)) return ObjectFieldComponent
 
     return DEF_FIELD_COMP
+  }
+
+  getEmptyValueByType (type: string): any {
+    const t: SchemaType = store.getters.getTypeByName(type)
+    if (t) {
+      // object type
+      const o: any = {}
+      t.fields.forEach(f => {
+        o[f.name] = this.getEmptyValueByType(f.type)
+      })
+      return o
+    }
+
+    return EMPTY_ITEM_MAP[type] ? EMPTY_ITEM_MAP[type]() : undefined
   }
 
   validateField (f: Field, o: any): string[] {

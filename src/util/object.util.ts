@@ -28,7 +28,7 @@ export class ObjectUtil {
 
   deepEquals (a: object, b: object): boolean {
     return (
-      JSON.stringify(this.sortObject(a)) === JSON.stringify(this.sortObject(b))
+      JSON.stringify(this.sortObjectDeep(a)) === JSON.stringify(this.sortObjectDeep(b))
     )
   }
 
@@ -86,6 +86,7 @@ export class ObjectUtil {
   }
 
   sortObject<T> (o: T): T {
+    if (!o) return o
     return Object.keys(o)
       .sort()
       .reduce((r: any, k: any) => ((r[k] = (o as any)[k]), r), {} as any)

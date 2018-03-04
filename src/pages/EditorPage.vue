@@ -27,8 +27,8 @@
       />
     </form>
 
-    <pre>item: {{ item }}</pre>
-    <pre>validationState ({{valid}}): {{ validationState }}</pre>
+    <pre v-if="debug">item: {{ item }}</pre>
+    <pre v-if="debug">validationState ({{valid}}): {{ validationState }}</pre>
   </div>
 </template>
 
@@ -48,6 +48,7 @@ export default class EditorPage extends Vue {
   loading = 'loading...'
   validationState: {[f: string]: boolean} = {}
   forceDirty = false
+  debug = false
 
   get collection (): Collection {
     return this.$store.getters.getCollectionByName(this.$route.params['collectionName'])
@@ -101,8 +102,10 @@ export default class EditorPage extends Vue {
 
     // console.log('mounted! ' + this.itemId)
     if (this.newItem) {
-      this.originalItem = {__original: true}
-      this.item = {} // tada: put default values for each field
+      // this.originalItem = {__original: true}
+      this.item = schemaService.getEmptyValueByType(this.collection.type) || {}
+      this.originalItem = objectUtil.deepCopy(this.item)
+      // console.log('sss', this.item)
     } else {
       this.item = this.$store.getters.getItem(this.collection.name, this.itemId)
       if (!this.item) {
@@ -185,7 +188,7 @@ export default class EditorPage extends Vue {
   }
 
   updateSubItemValid (valid: boolean, fieldName: string) {
-    console.log(`updateSubItemValid editor ${fieldName}`, valid)
+    // console.log(`updateSubItemValid editor ${fieldName}`, valid)
 
     // Vue.nextTick(() => this.validationState[fieldName] = valid)
     this.validationState = {
