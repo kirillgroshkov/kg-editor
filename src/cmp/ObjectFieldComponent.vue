@@ -97,7 +97,7 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
   }
 
   toggleExpand () {
-    if (this.level > 1) {
+    if (this.level! > 1) {
       this.$emit('objectCollapsed')
     } else {
       this.expanded = !this.expanded

@@ -99,10 +99,6 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     return schemaService.getFieldComponent(subType)
   }
 
-  get valueChanged (): boolean {
-    return !objectUtil.deepEquals(this.value, this.originalValue)
-  }
-
   toggleExpand () {
     // alert('toggle')
     this.expanded = !this.expanded
