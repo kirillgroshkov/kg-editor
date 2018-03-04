@@ -1,13 +1,11 @@
 import { Field, schemaService } from '@/srv/schema.service'
+import { objectUtil } from '@/util/object.util'
 import { Prop } from 'vue-property-decorator'
 import Vue from 'vue'
 
 export class BaseFieldComponent extends Vue {
   @Prop()
   field: Field | undefined
-
-  // @Prop()
-  // item: any
 
   @Prop()
   value: any
@@ -27,7 +25,7 @@ export class BaseFieldComponent extends Vue {
   dirty = false
 
   get valueChanged (): boolean {
-    return this.value !== this.originalValue
+    return !objectUtil.deepEquals(this.value, this.originalValue)
   }
 
   get inputClass () {
@@ -60,12 +58,6 @@ export class BaseFieldComponent extends Vue {
     return {
       'md-invalid': (this.dirty || this.forceDirty) && !this.valid,
     }
-    /*if (!this.$v) return
-    const f = this.$v['value']
-
-    return {
-      'md-invalid': f && f.$invalid && f.$dirty,
-    }*/
   }
 
   get valid (): boolean {

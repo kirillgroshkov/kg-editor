@@ -46,7 +46,6 @@
 <script lang="ts">
 import Component from 'vue-class-component'
 import { Field, schemaService } from "../srv/schema.service"
-import { objectUtil } from '../util/object.util';
 import { BaseFieldComponent } from './BaseFieldComponent';
 
 @Component
@@ -56,22 +55,16 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
   validationState: {[f: string]: boolean} = {}
   localForceDirty = false
 
-  /*get localForceDirty () {
-    return this.forceDirty || this._forceDirty
-  }*/
-
   get subType (): Field {
     // console.log('subType: ' + this.field!.type)
     return this.$store.getters.getTypeByName(this.field!.type)
   }
 
   get subItem (): any {
-    // return JSON.parse(this.value || '{}')
     return this.value
   }
 
   set subItem (v: any) {
-    // this.$emit('input', JSON.stringify(v || {}))
     this.$emit('input', v)
     this.emitValidationState()
   }
@@ -80,12 +73,10 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
     return schemaService.getFieldComponent(type)
   }
 
-  get valueChanged (): boolean {
-    return !objectUtil.deepEquals(this.value, this.originalValue)
-  }
-
   get valid (): boolean {
-    return Object.values(this.validationState).find(v => !v) === undefined
+    return Object.keys(this.validationState)
+      .map(k => this.validationState[k])
+      .find(v => !v) === undefined
   }
 
   get saveEnabled (): boolean {

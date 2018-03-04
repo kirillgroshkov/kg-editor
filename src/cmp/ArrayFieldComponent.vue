@@ -1,5 +1,6 @@
 <template>
   <md-card :md-with-hover="!expanded" class="card">
+    <!-- Card header -->
     <md-card-header aclick.native="toggleExpand">
       <md-card-header-text class="md-layout">
         <div style="padding-top: 6px; padding-right: 16px;">
@@ -24,6 +25,7 @@
       </md-menu>
     </md-card-header>
 
+    <!-- Card content -->
     <md-card-content v-show="expanded && subItems.length">
       <!-- Expanded item -->
       <md-card v-if="expandedSubItem > -1"
@@ -72,10 +74,8 @@
 
 <script lang="ts">
 import Component from 'vue-class-component'
-import Vue from "vue"
 import { schemaService } from '../srv/schema.service';
 import { arrayUtil } from '../util/array.util';
-import { objectUtil } from '../util/object.util';
 import { BaseFieldComponent } from './BaseFieldComponent';
 
 @Component
@@ -120,7 +120,6 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   }
 
   addEmptySubItem () {
-    // const emptyItem = schemaService.isObjectType(this.field!.arrayOf!) ? {} : undefined
     const emptyItem = schemaService.getEmptyValueByType(this.field!.arrayOf!) || undefined
     this.subItems = [
       emptyItem,
@@ -151,10 +150,6 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
 
     // for primitive types
     return this.field
-  }
-
-  get valueChanged (): boolean {
-    return !objectUtil.deepEquals(this.value, this.originalValue)
   }
 
   get valid (): boolean {

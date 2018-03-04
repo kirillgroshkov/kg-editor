@@ -84,7 +84,9 @@ export default class EditorPage extends Vue {
   }
 
   get valid (): boolean {
-    return Object.values(this.validationState).find(v => !v) === undefined
+    return Object.keys(this.validationState)
+      .map(k => this.validationState[k])
+      .find(v => !v) === undefined
   }
 
   item: any = null
