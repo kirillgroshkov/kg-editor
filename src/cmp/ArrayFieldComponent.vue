@@ -43,8 +43,7 @@
               :inArray="true"
               @input="updateSubItem($event, expandedSubItem)"
               @valid="updateSubItemValid($event, expandedSubItem)"
-              @objectCollapsed="collapseSubItem"
-              @objectCancelled="cancelSubItem"
+              @save="onSave()"
             />
           </div>
         </md-card-content>
@@ -58,8 +57,8 @@
       >
         <md-card-content class="md-layout" @click.native="expandSubItem(i)">
           <div class="md-layout-item md-size-100 md-layout md-alignment-center-center">
-            <div class="md-layout-item">
-              {{subItem || 'empty'}}
+            <div class="md-layout-item" :class="getSubItemClass(i)">
+              {{ getCellContent(subItem) }}
             </div>
 
             <md-button class="md-icon-button" @click.stop="move(i, -1)" :disabled="i === 0"><md-icon>keyboard_arrow_up</md-icon></md-button>
@@ -78,6 +77,7 @@
 import Component from 'vue-class-component'
 import { schemaService } from '../srv/schema.service';
 import { arrayUtil } from '../util/array.util';
+import { objectUtil } from '../util/object.util';
 import { BaseFieldComponent } from './BaseFieldComponent';
 
 @Component
@@ -99,6 +99,12 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   get fieldComponent () {
     const subType = this.field!.arrayOf!
     return schemaService.getFieldComponent(subType)
+  }
+
+  getSubItemClass (i: number) {
+    return {
+      changed: !objectUtil.deepEquals(this.subItems[i], (this.originalValue || {})[i]),
+    }
   }
 
   toggleExpand () {
@@ -124,11 +130,11 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   addEmptySubItem () {
     const emptyItem = schemaService.getEmptyValueByType(this.field!.arrayOf!) || undefined
     this.subItems = [
-      emptyItem,
       ...this.subItems,
+      emptyItem,
     ]
 
-    this.expandedSubItem = 0
+    this.expandedSubItem = this.subItems.length
   }
 
   removeSubItem (i: number) {
@@ -154,6 +160,10 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     return this.field
   }
 
+  getCellContent (subItem: any): string {
+    return schemaService.getCellContent(this.getSubField(), subItem) as string
+  }
+
   get valid (): boolean {
     return Object.values(this.validationState).find(v => !v) === undefined
   }
@@ -165,9 +175,14 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
   updateSubItem (v: any, i: any) {
     // console.log('updateSubItem arr [' + i + ']', v)
 
-    const subItems = this.subItems
-    subItems[i] = v
-    this.subItems = subItems
+    if (v !== undefined) {
+      const subItems = this.subItems
+      subItems[ i ] = v
+      this.subItems = subItems
+    } else {
+      this.removeSubItem(this.expandedSubItem)
+      this.expandedSubItem = -1
+    }
   }
 
   updateSubItemValid (valid: boolean, index: number) {
@@ -180,8 +195,10 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     this.emitValidationState()
   }
 
-  collapseSubItem () {
+  onSave () {
     this.expandedSubItem = -1
+    // save!
+    this.$emit('save')
   }
 
   cancelSubItem () {
@@ -197,10 +214,10 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     line-height: 26px !important;
     // font-weight: normal !important;
     transition: background-color .3s ease-in-out;
+  }
 
-    &.changed {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
+  .changed {
+    background-color: rgba(0, 0, 0, 0.1);
   }
 
   .card {

@@ -14,9 +14,11 @@ export interface AppSchema {
   collections: Collection[]
 }
 
+// ObjectType
 export interface SchemaType {
   name: string
   label: string
+  labelFields: string[]
   fields: Field[]
 }
 
@@ -36,6 +38,7 @@ export interface Field {
   def?: any
   required?: boolean
   protected?: boolean
+  labelField?: boolean
 
   minLength?: number
   maxLength?: number
@@ -101,6 +104,39 @@ class SchemaService {
     return EMPTY_ITEM_MAP[type] ? EMPTY_ITEM_MAP[type]() : undefined
   }
 
+  // array of array is not allowed ATM
+  getCellContent (f: Field, value: any): string | string[] | undefined {
+    if (value === undefined) return undefined
+    const typeName = f.type
+
+    if (typeName === 'array') {
+      return value.map((i: any) => this.getCellContentByType(f.arrayOf!, i, 2))
+    }
+
+    return this.getCellContentByType(typeName, value, 1)
+  }
+
+  private getCellContentByType (typeName: string, value: any, level: number): string | undefined {
+    if (value === undefined) return undefined
+
+    const t: SchemaType = store.getters.getTypeByName(typeName)
+    if (!t) {
+      // primitive type
+      return value
+    }
+
+    // object type
+    const labelItems: string[] = []
+    t.labelFields.forEach(fieldName => {
+      const field = t.fields.find(f => f.name === fieldName)
+      if (field) {
+        const labelItem = this.getCellContentByType(field.type, value[fieldName], level + 1)
+        if (labelItem !== undefined) labelItems.push(labelItem)
+      }
+    })
+    return labelItems.join(', ')
+  }
+
   validateField (f: Field, o: any): string[] {
     const e: string[] = []
 
@@ -127,6 +163,21 @@ class SchemaService {
   }
 
   // mutates
+  private completeType (t: SchemaType): void {
+    Object.assign(t, {
+      label: t.label || stringUtil.capitalizeFirstLetter(t.name),
+    })
+
+    let labelFields: string[] = []
+    t.fields.forEach(f => {
+      this.completeField(f)
+      if (f.labelField) labelFields.push(f.name)
+    })
+
+    t.labelFields = labelFields.length ? labelFields : ['id']
+  }
+
+  // mutates
   private completeField (f: Field): void {
     if (f.name === 'id') {
       Object.assign(f, {
@@ -149,15 +200,6 @@ class SchemaService {
       label: c.label || stringUtil.capitalizeFirstLetter(c.name),
       icon: c.icon || 'collections',
     })
-  }
-
-  // mutates
-  private completeType (t: SchemaType): void {
-    Object.assign(t, {
-      label: t.label || stringUtil.capitalizeFirstLetter(t.name),
-    })
-
-    t.fields.forEach(f => this.completeField(f))
   }
 }
 

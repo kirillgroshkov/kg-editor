@@ -12,21 +12,21 @@
             class="md-raised md-dense"
             av-focus="focus"
             @click="onSave"
-            :disabled="!saveEnabled"
             v-if="saveEnabled"
-          >Save</md-button>
+          >{{saveButtonLabel}}</md-button>
 
           <md-button
             class="md-raised md-dense"
             av-focus="focus"
-            @click="onCancel"
-            v-if="saveEnabled"
-          >Cancel</md-button>
+            @click="onReset"
+            :disabled="!resetEnabled"
+            aif="saveEnabled"
+          >Reset</md-button>
         </div>
       </md-card-header-text>
 
       <md-menu md-size="big" md-direction="bottom-end">
-        <md-button class="md-icon-button" @click="toggleExpand">
+        <md-button class="md-icon-button" @click="toggleExpand" v-if="!saveEnabled">
           <md-icon>{{expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}</md-icon>
         </md-button>
       </md-menu>
@@ -44,9 +44,12 @@
         :focus="f.name === focusedFieldName"
         @input="updateSubItem($event, f.name)"
         @valid="updateSubItemValid($event, f.name)"
+        @save="onSave()"
         />
 
-      <pre v-if="debug">valid={{valid}} {{subItem}}</pre>
+      <pre v-if="debug">valid={{valid}} expanded={{expanded}}
+{{subItem}}
+original {{originalValue}}</pre>
     </md-card-content>
   </md-card>
 </template>
@@ -59,7 +62,7 @@ import { BaseFieldComponent } from './BaseFieldComponent';
 @Component
 export default class ObjectFieldComponent extends BaseFieldComponent {
   expanded = true
-  debug = false
+  debug = true
   validationState: {[f: string]: boolean} = {}
   localForceDirty = false
 
@@ -88,7 +91,12 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
   }
 
   get saveEnabled (): boolean {
-    return !this.$store.state.ghostMode && this.valueChanged && (this.valid || !this.forceDirty || !this.localForceDirty)
+    // return !this.$store.state.ghostMode && this.valueChanged && (this.valid || !this.forceDirty || !this.localForceDirty)
+    return !this.$store.state.ghostMode && (this.valid || !this.forceDirty || !this.localForceDirty)
+  }
+
+  get resetEnabled (): boolean {
+    return this.valueChanged
   }
 
   get isRootLevel (): boolean {
@@ -100,17 +108,17 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
     return f ? f.name : undefined
   }
 
+  get saveButtonLabel (): string {
+    return this.valueChanged ? 'Save' : 'Close'
+  }
+
   mounted () {
     this.emitValidationState()
   }
 
   toggleExpand () {
     if (this.inArray) {
-      if (this.valueChanged) {
-        this.onSave()
-      } else {
-        this.onCancel()
-      }
+      this.onSave()
     } else {
       this.expanded = !this.expanded
     }
@@ -136,19 +144,18 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
   }
 
   onSave () {
-    if (!this.saveEnabled) return
-
     // Validate before saving
     if (!this.valid) {
       this.localForceDirty = true
       return
     }
 
-    this.$emit('objectCollapsed')
+    this.$emit('save')
   }
 
-  onCancel () {
-    this.$emit('objectCancelled')
+  onReset () {
+    this.$emit('input', this.originalValue)
+    // this.$emit('objectCancelled')
   }
 }
 </script>

@@ -39,7 +39,10 @@
             :md-sort-by="f.name"
             md-numeric
           >
-            {{ item[f.name] }}
+            <template v-if="f.arrayOf">
+              <md-chip v-for="arrayItem in getCellContent(f, item)" :key="arrayItem">{{arrayItem}}</md-chip>
+            </template>
+            <template v-else>{{ getCellContent(f, item) }}</template>
           </md-table-cell>
 
           <md-table-cell>
@@ -60,12 +63,14 @@ import { Route } from "vue-router";
 import { Progress } from '../decorators/progress.decorator';
 import { router } from '../router';
 import { apiService } from "../srv/api.service"
-import { Collection, Field } from "../srv/schema.service"
+import { Collection, Field, schemaService } from "../srv/schema.service"
 import { mousetrapUtil } from '../util/mousetrap.util';
 
 @Component
 export default class CollectionPage extends Vue {
   loadingTxt = ''
+  currentSort = 'id'
+  currentSortOrder = 'desc'
 
   get loading () {
     return !this.$store.getters.getItems(this.collection.name)
@@ -88,8 +93,11 @@ export default class CollectionPage extends Vue {
 
   // items: any[] = []
 
-  currentSort = 'id'
-  currentSortOrder = 'desc'
+  getCellContent (f: Field, item: any): string | string[] {
+    const c = schemaService.getCellContent(f, item[f.name])
+    if (f.arrayOf) return [...c.slice(0, 10), '...']
+    return c
+  }
 
   onSelect (item: any) {
     if (!item) return
@@ -178,5 +186,10 @@ export default class CollectionPage extends Vue {
     // display: flex !important;
     // height: auto !important;
     // max-height: auto !important;
+  }
+  .md-chip {
+    height: 28px;
+    line-height: 28px;
+    margin-top: 2px; margin-bottom: 2px;
   }
 </style>

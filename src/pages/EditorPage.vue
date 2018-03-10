@@ -6,7 +6,12 @@
                  style="margin-left: 0;"
                  :disabled="!saveEnabled"
                  @click="onSave(true)"
-      >Save (⌘+S)</md-button>
+      >{{ saveButtonLabel }}</md-button>
+
+      <md-button class="md-raised md-transparent md-layout-item1"
+                 :disabled="!resetEnabled"
+                 @click="onReset"
+      >Reset</md-button>
 
       <md-button class="md-raised md-transparent md-layout-item1"
                  :disabled="!exitEnabled"
@@ -24,6 +29,7 @@
         :level="0"
         @input="updateItem"
         @valid="updateItemValid"
+        @save="onSave()"
       />
 
       <pre v-if="debug" class="debug">item (valid={{valid}}): {{ item }}</pre>
@@ -89,11 +95,19 @@ export default class EditorPage extends Vue {
   }
 
   get saveEnabled (): boolean {
-    return !this.$store.state.ghostMode && this.valueChanged && (this.valid || !this.forceDirty)
+    return !this.$store.state.ghostMode && (this.valid || !this.forceDirty)
+  }
+
+  get resetEnabled (): boolean {
+    return !this.$store.state.ghostMode && this.valueChanged
   }
 
   get exitEnabled (): boolean {
-    return !this.$store.state.ghostMode
+    return !this.$store.state.ghostMode && this.isNewItem
+  }
+
+  get saveButtonLabel (): string {
+    return (this.valueChanged || this.isNewItem) ? 'Save (⌘+S)' : 'Close (⌘←)'
   }
 
   getFieldComponent (type: string) {
@@ -124,14 +138,28 @@ export default class EditorPage extends Vue {
 
     mousetrapUtil.bind({
       'command+s': () => this.onSave(),
-      'command+x': () => this.onExit(),
-      'command+left': () => this.onExit(),
-      'esc': () => this.onExit(),
+      // 'command+x': () => this.onExit(),
+      'command+left': () => this.onSave(true),
+      'esc': () => this.onSave(true),
     })
   }
 
   destroyed () {
     mousetrapUtil.unbind(['command+s', 'command+x', 'command+left', 'esc'])
+  }
+
+  async onReset () {
+    if (!this.resetEnabled) return
+
+    const confirm = await dialogService.dialog({
+      title: 'Reset',
+      content: 'Please confirm that you want to reset to original value',
+      textOk: 'Reset',
+      textCancel: 'Cancel',
+    })
+    if (!confirm) return
+
+    this.doReset()
   }
 
   async onExit () {
@@ -145,7 +173,6 @@ export default class EditorPage extends Vue {
       if (!confirm) return
     }
 
-    if (!this.exitEnabled) return
     this.doExit()
   }
 
@@ -153,7 +180,13 @@ export default class EditorPage extends Vue {
     router.push(`/collection/${this.collection.name}`)
   }
 
+  doReset () {
+    this.item = objectUtil.deepCopy(this.originalItem)
+  }
+
   async onSave (exit = false) {
+    if (!this.valueChanged && !this.isNewItem) return this.doExit()
+
     if (!this.saveEnabled) return
 
     // Validate before saving
@@ -163,7 +196,14 @@ export default class EditorPage extends Vue {
     }
 
     await this.doSave()
-    if (exit) this.doExit()
+    this.forceDirty = false
+    if (exit) {
+      this.doExit()
+    } else {
+      if (this.isNewItem) {
+        router.push(`/edit/${this.collection.name}/${this.item.id}`)
+      }
+    }
   }
 
   @Progress()
