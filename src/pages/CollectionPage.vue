@@ -46,7 +46,7 @@
           </md-table-cell>
 
           <md-table-cell>
-            <md-button class="md-icon-button" @click="onDelete(item.id)">
+            <md-button class="md-icon-button" @click.stop="onDelete(item.id)">
               <md-icon>delete</md-icon>
             </md-button>
           </md-table-cell>
@@ -103,18 +103,22 @@ export default class CollectionPage extends Vue {
     if (!item) return
     // alert('onSelect' + item)
     // this.selected = item || {}
-    const selectedId = item.id
-    this.$router.push(`/edit/${this.collection.name}/${selectedId}`)
+    this.$router.push(`/edit/${this.collection.name}/${item.id}`)
 
   }
 
+  @Progress()
   async onDelete (id: string) {
     if (!confirm('sure?')) return
-    this.loadingTxt = 'deleting...'
+    this.$store.commit('deleteItem', {
+      collectionName: this.collection.name,
+      id,
+    })
+    // this.loadingTxt = 'deleting...'
     await apiService.deleteItem(this.collection.name, id)
     // alert('deleted ' + id)
     await apiService.getItems(this.collection.name)
-    this.loadingTxt = ''
+    // this.loadingTxt = ''
   }
 
   onCreate () {

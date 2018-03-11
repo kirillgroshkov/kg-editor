@@ -35,12 +35,12 @@ class ApiService extends FetchService {
     const r = await this.put(`/data/${collectionName}`, {
       body: item,
     })
-    console.log('resp!', r)
+    // console.log('resp!', r)
   }
 
   async deleteItem (collectionName: string, itemId: string): Promise<void> {
     const r = await this.delete(`/data/${collectionName}/${itemId}`)
-    console.log('resp!', r)
+    // console.log('resp!', r)
   }
 }
 

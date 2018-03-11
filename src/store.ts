@@ -72,10 +72,13 @@ export const store = new Vuex.Store<State>({
         ...state.items,
         [data.collectionName]: data.items,
       }
-      /*state.items[data.collectionName] = [
-        ...state.items[data.collectionName] || [],
-        ...data.items,
-      ]*/
+    },
+
+    deleteItem (state: State, data: {collectionName: string, id: string}): void {
+      state.items = {
+        ...state.items,
+        [data.collectionName]: state.items[data.collectionName].filter(i => i.id !== data.id),
+      }
     },
 
     setSnackbarText (state: State, txt: string): void {
