@@ -42,6 +42,8 @@ export interface Field {
 
   minLength?: number
   maxLength?: number
+  regex?: string
+  regexDescr?: string
 
   objectOf?: string
   arrayOf?: string
@@ -153,6 +155,11 @@ class SchemaService {
       if (o && o.length > f.maxLength) e.push(`should be shorter than ${f.minLength}`)
     }
 
+    if (f.regex) {
+      const regex = new RegExp(f.regex)
+      if (o && !regex.test(o)) e.push(f.regexDescr || `should match regex: ${f.regex}`)
+    }
+
     return e
   }
 
@@ -184,7 +191,9 @@ class SchemaService {
         type: 'id',
         label: 'id',
         required: true,
-        maxLength: f.maxLength || 16,
+        regex: '^[a-zA-Z0-9-_]{1,32}$',
+        regexDescr: 'Should be alphanumeric (dashes and underscores allowed)',
+        maxLength: f.maxLength || 32,
       })
     }
 
