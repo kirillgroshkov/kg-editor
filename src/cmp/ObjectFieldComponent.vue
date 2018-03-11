@@ -68,7 +68,7 @@ import { BaseFieldComponent } from './BaseFieldComponent';
 @Component
 export default class ObjectFieldComponent extends BaseFieldComponent {
   expanded = true
-  debug = true
+  debug = false
   validationState: {[f: string]: boolean} = {}
   localForceDirty = false
 

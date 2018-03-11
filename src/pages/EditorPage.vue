@@ -83,7 +83,7 @@ export default class EditorPage extends Vue {
   loading = 'loading...'
   valid = false
   forceDirty = false
-  debug = true
+  debug = false
   jsonMode = false
   jsonEditor: Editor = false as any
   jsonValid = false
