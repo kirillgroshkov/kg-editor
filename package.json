@@ -9,6 +9,8 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "brace": "^0.11.1",
+    "clipboard": "^2.0.0",
     "kg-shared": "^1.0.2",
     "mousetrap": "^1.6.1",
     "vue": "^2.5.2",
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@naturalcycles/shared-dev": "^1.0.10",
+    "@types/clipboard": "^2.0.0",
     "@types/mousetrap": "^1.6.0",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.22.1",

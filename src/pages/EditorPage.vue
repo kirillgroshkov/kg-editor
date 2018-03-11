@@ -1,38 +1,63 @@
 <template>
   <pre v-if="loading">{{loading}}</pre>
-  <div v-else class="md-layout-item md-alignment-top-left1">
-    <div class="md-layout-item md-layout buttons">
-      <md-button class="md-raised md-primary md-layout-item1"
-                 style="margin-left: 0;"
-                 :disabled="!saveEnabled"
-                 @click="onSave(true)"
-      >{{ saveButtonLabel }}</md-button>
+  <div v-else class="md-layout-item">
+    <div class="md-layout-item md-layout buttons" style="margin-left: -8px;">
+      <template v-if="!jsonMode">
+        <md-button class="md-raised md-primary"
+                   :disabled="!saveEnabled"
+                   @click="onSave(true)"
+        >{{ saveButtonLabel }}</md-button>
 
-      <md-button class="md-raised md-transparent md-layout-item1"
-                 :disabled="!resetEnabled"
-                 @click="onReset"
-      >Reset</md-button>
+        <md-button class="md-raised md-transparent"
+                   :disabled="!resetEnabled"
+                   @click="onReset"
+        >Reset</md-button>
 
-      <md-button class="md-raised md-transparent md-layout-item1"
-                 :disabled="!exitEnabled"
-                 @click="onExit"
-      >Exit (⌘←)</md-button>
+        <md-button class="md-raised md-transparent"
+                   :disabled="!exitEnabled"
+                   @click="onExit"
+        >Exit (⌘←)</md-button>
+
+        <md-button class="md-raised md-transparent"
+                   v-if="false"
+                   @click="onExport()"
+        >Export</md-button>
+      </template>
+
+      <md-button class="md-raised md-transparent"
+                 :disabled="!modeEnabled"
+                 @click="onMode()"
+      >{{ modeLabel }}</md-button>
+
+      <md-button class="md-raised md-transparent copyToClipboard"
+                 v-if="jsonMode"
+                 :disabled="!modeEnabled"
+      >copy to clipboard</md-button>
     </div>
 
     <div class="mainEditor">
-      <component
-        v-bind:is="getFieldComponent(collection.type)"
-        :value="item"
-        :originalValue="originalItem"
-        :forceDirty="forceDirty"
-        :field="field"
-        :level="0"
-        @input="updateItem"
-        @valid="updateItemValid"
-        @save="onSave()"
-      />
+      <!-- JSON mode-->
+      <template v-if="jsonMode">
+        <div id="jsonEditor"></div>
+        <pre>{{ item }}</pre>
+      </template>
 
-      <pre v-if="debug" class="debug">item (valid={{valid}}): {{ item }}</pre>
+      <!-- UI mode-->
+      <template v-if="!jsonMode">
+        <component
+          v-bind:is="getFieldComponent(collection.type)"
+          :value="item"
+          :originalValue="originalItem"
+          :forceDirty="forceDirty"
+          :field="field"
+          :level="0"
+          @input="updateItem"
+          @valid="updateItemValid"
+          @save="onSave()"
+        />
+
+        <pre v-if="debug" class="debug">item (valid={{valid}}): {{ item }}</pre>
+      </template>
     </div>
   </div>
 </template>
@@ -45,8 +70,13 @@ import { router } from '../router';
 import { apiService } from "../srv/api.service"
 import { dialogService } from '../srv/dialog.service';
 import { Collection, Field, schemaService, SchemaType } from "../srv/schema.service"
-import { mousetrapUtil } from '../util/mousetrap.util';
-import { objectUtil } from '../util/object.util';
+import { mousetrapUtil } from '../util/mousetrap.util'
+import { objectUtil } from '../util/object.util'
+import * as Clipboard from 'clipboard'
+import { Editor } from 'brace'
+import * as ace from 'brace'
+import 'brace/mode/json'
+import 'brace/theme/dracula'
 
 @Component
 export default class EditorPage extends Vue {
@@ -54,6 +84,10 @@ export default class EditorPage extends Vue {
   valid = false
   forceDirty = false
   debug = true
+  jsonMode = false
+  jsonEditor: Editor | null = null
+  jsonValid = false
+  clip: Clipboard | null = null
 
   item: any = null
 
@@ -106,8 +140,16 @@ export default class EditorPage extends Vue {
     return !this.$store.state.ghostMode && this.isNewItem
   }
 
+  get modeEnabled (): boolean {
+    return !this.jsonMode || this.jsonValid
+  }
+
   get saveButtonLabel (): string {
     return (this.valueChanged || this.isNewItem) ? 'Save (⌘+S)' : 'Close (⌘←)'
+  }
+
+  get modeLabel () {
+    return this.jsonMode ? 'UI mode' : 'JSON mode'
   }
 
   getFieldComponent (type: string) {
@@ -206,6 +248,55 @@ export default class EditorPage extends Vue {
     }
   }
 
+  async onExport () {
+    const jsonStr = JSON.stringify(this.item, undefined, 2)
+
+    const dialogPromise = dialogService.dialog({
+      title: 'Export',
+      content: `<button id="copy1" style="width: 100%; height: 30px;">Copy to clipboard</button><pre>${jsonStr}</pre>`,
+    })
+    const clip = new Clipboard('#copy1', {
+      text: () => jsonStr,
+    })
+
+    await dialogPromise
+    clip.destroy()
+  }
+
+  onMode () {
+    this.jsonMode = !this.jsonMode
+
+    if (this.jsonMode) {
+      // entering jsonMode
+      Vue.nextTick(() => {
+        this.jsonValid = true
+        this.jsonEditor = ace.edit('jsonEditor')
+        this.jsonEditor.$blockScrolling = Infinity
+        this.jsonEditor.getSession().setMode('ace/mode/json')
+        this.jsonEditor.setTheme('ace/theme/dracula')
+        this.jsonEditor.setValue(JSON.stringify(this.item, undefined, 2))
+        this.jsonEditor.session.on('change', () => {
+          try {
+            this.item = JSON.parse(this.jsonEditor!.getValue())
+            this.jsonValid = true
+          } catch (err) {
+            this.jsonValid = false
+          }
+        })
+
+        this.clip = new Clipboard('.copyToClipboard', {
+          text: () => JSON.stringify(this.item, undefined, 2),
+        })
+      })
+    } else {
+      // exiting jsonMode
+      this.jsonEditor!.destroy()
+      this.clip!.destroy()
+      // this.jsonEditor = null
+      this.forceDirty = true
+    }
+  }
+
   @Progress()
   async doSave () {
     console.log('saving', JSON.stringify(this.item, null, 2))
@@ -246,5 +337,13 @@ export default class EditorPage extends Vue {
 
   pre.debug {
     margin-top: 0;
+  }
+
+  #jsonEditor {
+    // background-color: red;
+    width: 100%;
+    height: 400px;
+    // min-height: 100%;
+    // height: 100%;
   }
 </style>

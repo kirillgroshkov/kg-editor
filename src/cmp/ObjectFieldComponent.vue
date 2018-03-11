@@ -10,10 +10,16 @@
         <div class="md-layout-item" style="padding-top: 2px;" v-if="level > 1">
           <md-button
             class="md-raised md-dense"
-            av-focus="focus"
-            @click="onSave"
+            @click="onSave()"
             v-if="saveEnabled"
-          >{{saveButtonLabel}}</md-button>
+          >Save</md-button>
+
+          <md-button
+            class="md-raised md-dense"
+            av-focus="focus"
+            @click="onClose()"
+            v-if="closeEnabled"
+          >Close</md-button>
 
           <md-button
             class="md-raised md-dense"
@@ -91,12 +97,15 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
   }
 
   get saveEnabled (): boolean {
-    // return !this.$store.state.ghostMode && this.valueChanged && (this.valid || !this.forceDirty || !this.localForceDirty)
-    return !this.$store.state.ghostMode && (this.valid || !this.forceDirty || !this.localForceDirty)
+    return !this.$store.state.ghostMode && this.valueChanged && (this.valid || !this.forceDirty || !this.localForceDirty)
   }
 
   get resetEnabled (): boolean {
     return this.valueChanged
+  }
+
+  get closeEnabled (): boolean {
+    return !this.valueChanged
   }
 
   get isRootLevel (): boolean {
@@ -106,10 +115,6 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
   get focusedFieldName (): string | undefined {
     const f = this.subType.fields.find(f => !f.protected)
     return f ? f.name : undefined
-  }
-
-  get saveButtonLabel (): string {
-    return this.valueChanged ? 'Save' : 'Close'
   }
 
   mounted () {
@@ -151,6 +156,10 @@ export default class ObjectFieldComponent extends BaseFieldComponent {
     }
 
     this.$emit('save')
+  }
+
+  onClose () {
+    this.$emit('close')
   }
 
   onReset () {

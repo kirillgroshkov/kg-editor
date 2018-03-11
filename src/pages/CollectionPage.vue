@@ -94,8 +94,12 @@ export default class CollectionPage extends Vue {
   // items: any[] = []
 
   getCellContent (f: Field, item: any): string | string[] {
-    const c = schemaService.getCellContent(f, item[f.name])
-    if (f.arrayOf) return [...c.slice(0, 10), '...']
+    const c = schemaService.getCellContent(f, item[f.name])!
+    if (f.arrayOf) {
+      return c.length > 10
+        ? [...c.slice(0, 10), '...']
+        : [...c]
+    }
     return c
   }
 

@@ -44,6 +44,7 @@
               @input="updateSubItem($event, expandedSubItem)"
               @valid="updateSubItemValid($event, expandedSubItem)"
               @save="onSave()"
+              @close="onClose()"
             />
           </div>
         </md-card-content>
@@ -199,6 +200,10 @@ export default class ArrayFieldComponent extends BaseFieldComponent {
     this.expandedSubItem = -1
     // save!
     this.$emit('save')
+  }
+
+  onClose () {
+    this.expandedSubItem = -1
   }
 
   cancelSubItem () {
