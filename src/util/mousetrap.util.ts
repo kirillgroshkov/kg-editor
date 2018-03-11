@@ -1,7 +1,8 @@
-
 import * as Mousetrap from 'mousetrap'
 
-type MousetrapBind = { [k: string]: (e: ExtendedKeyboardEvent, combo: string) => any }
+interface MousetrapBind {
+  [k: string]: (e: ExtendedKeyboardEvent, combo: string) => any
+}
 
 class MousetrapUtil {
   stopCallback (): boolean {

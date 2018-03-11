@@ -1,4 +1,3 @@
-
 export interface Deferred<T> {
   promise: Promise<T>
   resolve (a?: T): void

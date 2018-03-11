@@ -17,7 +17,7 @@ class BootstrapService {
     await this.appInit()
 
     mousetrapUtil.bind({
-      'up up down down left right left right b a enter': () => alert('konami')
+      'up up down down left right left right b a enter': () => alert('konami'),
     })
   }
 
@@ -47,7 +47,7 @@ class BootstrapService {
         store.commit('setGhost', false)
         let cls: string = r.target && r.target.constructor && r.target.constructor.name
         if (cls) cls += '.'
-        let args: string = (r.args && r.args.length) ? JSON.stringify(r.args) + ' ' : ''
+        const args: string = r.args && r.args.length ? JSON.stringify(r.args) + ' ' : ''
         console.log(`@${r.decoratorName} ${cls}${r.propertyKey}() ${args}took ${r.millis} ms`)
         app.$Progress.finish()
       },

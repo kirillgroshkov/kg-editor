@@ -85,14 +85,14 @@ export default class EditorPage extends Vue {
   forceDirty = false
   debug = true
   jsonMode = false
-  jsonEditor: Editor | null = null
+  jsonEditor: Editor = false as any
   jsonValid = false
-  clip: Clipboard | null = null
+  clip: Clipboard = false as any
 
-  item: any = null
+  item: any = false as any
 
   // this is what is saved to db
-  originalItem: any = null
+  originalItem: any = false as any
 
   get collection (): Collection {
     return this.$store.getters.getCollectionByName(this.$route.params['collectionName'])
@@ -299,7 +299,7 @@ export default class EditorPage extends Vue {
 
   @Progress()
   async doSave () {
-    console.log('saving', JSON.stringify(this.item, null, 2))
+    console.log('saving', JSON.stringify(this.item, undefined, 2))
     const _originalItem = objectUtil.deepCopy(this.originalItem)
 
     try {

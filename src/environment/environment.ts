@@ -1,6 +1,6 @@
+import envDev from './environment.dev'
 import { Environment } from './environment.prod'
 import envProd from './environment.prod'
-import envDev from './environment.dev'
 
 const ENV_DEF = 'dev'
 const ENVIRONMENTS = {

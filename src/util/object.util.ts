@@ -1,3 +1,5 @@
+/* tslint:disable:no-null-keyword */
+
 export class ObjectUtil {
   // Picks just allowed fields and no other fields
   // pick<T> (obj: any, fields: string[], initialObject = {}): T {
@@ -27,9 +29,7 @@ export class ObjectUtil {
   }
 
   deepEquals (a: object, b: object): boolean {
-    return (
-      JSON.stringify(this.sortObjectDeep(a)) === JSON.stringify(this.sortObjectDeep(b))
-    )
+    return JSON.stringify(this.sortObjectDeep(a)) === JSON.stringify(this.sortObjectDeep(b))
   }
 
   /**
@@ -40,9 +40,7 @@ export class ObjectUtil {
   }
 
   isObject (item: any): boolean {
-    return (
-      item && typeof item === 'object' && !Array.isArray(item) && item !== null
-    )
+    return item && typeof item === 'object' && !Array.isArray(item) && item !== null
   }
 
   isEmpty (obj: any): boolean {

@@ -4,7 +4,7 @@ export class FetchService {
     const opt = {
       method,
       credentials: 'include',
-      ..._opt
+      ..._opt,
     } as any
 
     // Stringify body
@@ -21,7 +21,7 @@ export class FetchService {
     const resp = await fetch(url, opt)
     if (!resp.ok) {
       const err = new Error(resp.statusText)
-      ;(err as any).response = resp
+      ; (err as any).response = resp
       return Promise.reject(err)
     }
 

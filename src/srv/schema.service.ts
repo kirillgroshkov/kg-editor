@@ -1,10 +1,10 @@
-import StringFieldComponent from '@/cmp/StringFieldComponent.vue'
+import ArrayFieldComponent from '@/cmp/ArrayFieldComponent.vue'
 import BooleanFieldComponent from '@/cmp/BooleanFieldComponent.vue'
 import DateFieldComponent from '@/cmp/DateFieldComponent.vue'
-import TextFieldComponent from '@/cmp/TextFieldComponent.vue'
 import NumberFieldComponent from '@/cmp/NumberFieldComponent.vue'
 import ObjectFieldComponent from '@/cmp/ObjectFieldComponent.vue'
-import ArrayFieldComponent from '@/cmp/ArrayFieldComponent.vue'
+import StringFieldComponent from '@/cmp/StringFieldComponent.vue'
+import TextFieldComponent from '@/cmp/TextFieldComponent.vue'
 import { stringUtil } from '@/srv/string.util'
 import { store } from '@/store'
 import { Component } from 'vue'
@@ -49,7 +49,7 @@ export interface Field {
   arrayOf?: string
 }
 
-const TYPE_MAP: {[type: string]: any} = {
+const TYPE_MAP: { [type: string]: any } = {
   boolean: BooleanFieldComponent,
   string: StringFieldComponent,
   date: DateFieldComponent,
@@ -59,7 +59,7 @@ const TYPE_MAP: {[type: string]: any} = {
   array: ArrayFieldComponent,
 }
 
-const EMPTY_ITEM_MAP: {[type: string]: () => any} = {
+const EMPTY_ITEM_MAP: { [type: string]: () => any } = {
   boolean: () => false,
   id: () => '',
   string: () => '',
@@ -72,14 +72,13 @@ const EMPTY_ITEM_MAP: {[type: string]: () => any} = {
 
 const DEF_FIELD_COMP = StringFieldComponent
 
-
 class SchemaService {
   isObjectType (type: string): boolean {
     return !!store.getters.getTypeByName(type)
   }
 
   getFieldComponent (type: string): Component {
-    let c = TYPE_MAP[type]
+    const c = TYPE_MAP[type]
     if (c) return c
 
     if (this.isObjectType(type)) return ObjectFieldComponent
@@ -97,7 +96,7 @@ class SchemaService {
           // todo: validate (e.g number, or boolean)
           o[f.name] = f.def
         } else {
-          o[ f.name ] = this.getEmptyValueByType(f.type)
+          o[f.name] = this.getEmptyValueByType(f.type)
         }
       })
       return o
@@ -175,7 +174,7 @@ class SchemaService {
       label: t.label || stringUtil.capitalizeFirstLetter(t.name),
     })
 
-    let labelFields: string[] = []
+    const labelFields: string[] = []
     t.fields.forEach(f => {
       this.completeField(f)
       if (f.labelField) labelFields.push(f.name)

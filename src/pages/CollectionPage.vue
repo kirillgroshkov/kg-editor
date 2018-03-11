@@ -144,14 +144,9 @@ export default class CollectionPage extends Vue {
 
   @Progress()
   async init (collectionName: string) {
-    console.log('init: ' + collectionName)
+    // console.log('init: ' + collectionName)
     await apiService.getItems(collectionName)
   }
-
-  /*@Watch('$route')
-  onRouteChanged (val: string, oldVal: string) {
-    console.log('onRouteChanged', val)
-  }*/
 
   beforeRouteUpdate (to: Route, from: Route, next: Function): void {
     // console.log('beforeRouteUpdate')

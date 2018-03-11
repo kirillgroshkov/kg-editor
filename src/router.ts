@@ -1,9 +1,9 @@
+import CollectionPage from '@/pages/CollectionPage.vue'
+import EditorPage from '@/pages/EditorPage.vue'
+import HomePage from '@/pages/HomePage.vue'
 import { bootstrapService } from '@/srv/bootstrap.service'
 import Vue from 'vue'
 import Router from 'vue-router'
-import HomePage from '@/pages/HomePage.vue'
-import CollectionPage from '@/pages/CollectionPage.vue'
-import EditorPage from '@/pages/EditorPage.vue'
 
 Vue.use(Router)
 

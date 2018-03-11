@@ -10,7 +10,7 @@ export interface State {
   title: string
   project: string
   snackbarText: string
-  dialog: Dialog | null,
+  dialog: Dialog
   schema: AppSchema
   activeCollection: string
   items: { [collectionName: string]: any[] }
@@ -22,7 +22,7 @@ export const store = new Vuex.Store<State>({
     title: 'Home',
     project: 'innocent',
     snackbarText: '',
-    dialog: null,
+    dialog: false as any,
     schema: { collections: [], types: [] },
     activeCollection: '',
     items: {},
@@ -47,7 +47,7 @@ export const store = new Vuex.Store<State>({
 
     isSnackbarActive: (state: State) => () => {
       return !!state.snackbarText
-    }
+    },
   },
 
   mutations: {
@@ -67,14 +67,14 @@ export const store = new Vuex.Store<State>({
       state.activeCollection = activeCollection
     },
 
-    setItems (state: State, data: {collectionName: string, items: any[]}): void {
+    setItems (state: State, data: { collectionName: string; items: any[] }): void {
       state.items = {
         ...state.items,
         [data.collectionName]: data.items,
       }
     },
 
-    deleteItem (state: State, data: {collectionName: string, id: string}): void {
+    deleteItem (state: State, data: { collectionName: string; id: string }): void {
       state.items = {
         ...state.items,
         [data.collectionName]: state.items[data.collectionName].filter(i => i.id !== data.id),
@@ -90,7 +90,7 @@ export const store = new Vuex.Store<State>({
     },
 
     setDialog (state: State, dialog?: Dialog): void {
-      state.dialog = dialog || null
+      state.dialog = dialog || (false as any)
     },
   },
 })

@@ -1,3 +1,4 @@
+/* tslint:disable:ordered-imports */
 import '@/scss/global.scss'
 import '@/polyfills'
 import Vue from 'vue'
@@ -35,5 +36,5 @@ export const app = new Vue({
   store,
   el: '#app',
   components: { RootComponent },
-  template: '<RootComponent/>'
+  template: '<RootComponent/>',
 })

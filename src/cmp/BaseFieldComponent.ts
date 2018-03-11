@@ -1,29 +1,22 @@
 import { Field, schemaService } from '@/srv/schema.service'
 import { objectUtil } from '@/util/object.util'
-import { Prop } from 'vue-property-decorator'
 import Vue from 'vue'
+import { Prop } from 'vue-property-decorator'
 
 export class BaseFieldComponent extends Vue {
-  @Prop()
-  field: Field | undefined
+  @Prop() field: Field | undefined
 
-  @Prop()
-  value: any
+  @Prop() value: any
 
-  @Prop()
-  originalValue: any
+  @Prop() originalValue: any
 
-  @Prop()
-  focus: boolean | undefined
+  @Prop() focus: boolean | undefined
 
-  @Prop()
-  level: number | undefined
+  @Prop() level: number | undefined
 
-  @Prop()
-  inArray: boolean | undefined
+  @Prop() inArray: boolean | undefined
 
-  @Prop()
-  forceDirty: boolean | undefined
+  @Prop() forceDirty: boolean | undefined
 
   dirty = false
 

@@ -1,4 +1,2 @@
-class TableUtil {
-
-}
+class TableUtil {}
 export const tableUtil = new TableUtil()
